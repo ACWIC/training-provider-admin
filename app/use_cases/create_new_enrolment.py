@@ -1,8 +1,8 @@
 from pydantic import BaseModel
+
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.requests.enrolment_requests import NewEnrolmentRequest
-from app.responses import ResponseFailure
-from app.responses import ResponseSuccess
+from app.responses import ResponseFailure, ResponseSuccess
 
 
 class CreateNewEnrolment(BaseModel):
@@ -17,8 +17,7 @@ class CreateNewEnrolment(BaseModel):
     def execute(self, request: NewEnrolmentRequest):
         try:
             enrolment_authorisation = self.enrolment_repo.save_enrolment(
-                request.course_id,
-                request.student_id
+                request.course_id, request.student_id
             )
         except Exception as e:  # noqa - TODO: handle specific failure types
             return ResponseFailure.build_from_resource_error(message=e)

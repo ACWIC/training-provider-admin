@@ -1,10 +1,11 @@
 from enum import Enum
 from uuid import UUID
+
 from pydantic import BaseModel
 
 
 class EnrolmentStatus(str, Enum):
-    lodged = 'Lodged'
+    lodged = "Lodged"
 
 
 class EnrolmentAuthorisation(BaseModel):

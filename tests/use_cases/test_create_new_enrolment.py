@@ -1,8 +1,9 @@
 """
 These tests evaluate (and document) the business logic.
 """
-from uuid import uuid4
 from unittest import mock
+from uuid import uuid4
+
 from app.domain.entities.enrolment_authorisation import EnrolmentAuthorisation
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.requests.enrolment_requests import NewEnrolmentRequest
@@ -16,18 +17,14 @@ def test_create_new_enrolment_authorisation_success():
     the response type should be "Success".
     """
     repo = mock.Mock(spec=EnrolmentRepo)
-    enrolment = EnrolmentAuthorisation(
-        uuid=uuid4(),
-        course_id='123',
-        student_id='abc'
-    )
+    enrolment = EnrolmentAuthorisation(uuid=uuid4(), course_id="123", student_id="abc")
     repo.save_enrolment.return_value = enrolment
 
-    request = NewEnrolmentRequest(course_id='123', student_id='abc')
+    request = NewEnrolmentRequest(course_id="123", student_id="abc")
     use_case = CreateNewEnrolment(enrolment_repo=repo)
     response = use_case.execute(request)
 
-    assert response.type == 'Success'
+    assert response.type == "Success"
 
 
 def test_create_new_enrolment_authorisation_failure():
@@ -39,8 +36,8 @@ def test_create_new_enrolment_authorisation_failure():
     repo = mock.Mock(spec=EnrolmentRepo)
 
     repo.save_enrolment.side_effect = Exception()
-    request = NewEnrolmentRequest(course_id='123', student_id='abc')
+    request = NewEnrolmentRequest(course_id="123", student_id="abc")
     use_case = CreateNewEnrolment(enrolment_repo=repo)
     response = use_case.execute(request)
 
-    assert response.type == 'ResourceError'
+    assert response.type == "ResourceError"
