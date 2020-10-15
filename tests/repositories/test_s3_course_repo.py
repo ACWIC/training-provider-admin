@@ -67,21 +67,3 @@ def test_save_course(boto_client, uuid4):
         Key=f"courses/{course_id}.json",  # NOQA
         Bucket="some-bucket",
     )
-
-
-@patch("uuid.uuid4")
-@patch("boto3.client")
-def test_update_course(boto_client, uuid4):
-    pass
-
-
-@patch("uuid.uuid4")
-@patch("boto3.client")
-def test_get_course(boto_client, uuid4):
-    pass
-
-
-@patch("uuid.uuid4")
-@patch("boto3.client")
-def test_course_search(boto_client, uuid4):
-    pass

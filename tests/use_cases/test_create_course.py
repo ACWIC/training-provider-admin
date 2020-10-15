@@ -1,13 +1,14 @@
 """
 These tests evaluate (and document) the business logic.
 """
-# from unittest import mock
-# from uuid import uuid4
-#
-# from app.domain.entities.enrolment_authorisation import EnrolmentAuthorisation
-# from app.repositories.enrolment_repo import EnrolmentRepo
-# from app.requests.enrolment_requests import NewEnrolmentRequest
-# from app.use_cases.create_new_enrolment import CreateNewEnrolment
+import datetime
+from unittest import mock
+from uuid import uuid4
+
+from app.domain.entities.course import Course
+from app.repositories.course_repo import CourseRepo
+from app.requests.create_course_request import NewCourseRequest
+from app.use_cases.create_course import CreateNewCourse
 
 
 def test_create_course_success():
@@ -16,7 +17,39 @@ def test_create_course_success():
     if everything goes according to plan,
     the response type should be "Success".
     """
-    pass
+    repo = mock.Mock(spec=CourseRepo)
+    course_id = str(uuid4())
+    created = str(datetime.datetime.now())
+    course = Course(
+        course_id=course_id,
+        course_name="Bachelor of Community Services (HE20528)",
+        industry_standards="Police Check",
+        competancy="top rated",
+        location="Sydney",
+        date="2020-10-11T16:06:53.739338",
+        availablity="morning",
+        hours_per_week="10",
+        duration="2 months",
+        fees_from="200",
+        created=created,
+    )
+    repo.save_course.return_value = course
+
+    request = NewCourseRequest(
+        course_name="Bachelor of Community Services (HE20528)",
+        industry_standards="Police Check",
+        competancy="top rated",
+        location="Sydney",
+        date="2020-10-11T16:06:53.739338",
+        availablity="morning",
+        hours_per_week="10",
+        duration="2 months",
+        fees_from="200",
+    )
+    use_case = CreateNewCourse(course_repo=repo)
+    response = use_case.execute(request)
+
+    assert response.type == "Success"
 
 
 def test_create_course_failure():
@@ -25,4 +58,21 @@ def test_create_course_failure():
     if there is some kind of error,
     the response type should be "ResourceError".
     """
-    pass
+    repo = mock.Mock(spec=CourseRepo)
+
+    repo.save_course.side_effect = Exception()
+    request = NewCourseRequest(
+        course_name="Bachelor of Community Services (HE20528)",
+        industry_standards="Police Check",
+        competancy="top rated",
+        location="Sydney",
+        date="2020-10-11T16:06:53.739338",
+        availablity="morning",
+        hours_per_week="10",
+        duration="2 months",
+        fees_from="200",
+    )
+    use_case = CreateNewCourse(course_repo=repo)
+    response = use_case.execute(request)
+
+    assert response.type == "ResourceError"
