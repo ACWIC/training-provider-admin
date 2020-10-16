@@ -29,3 +29,15 @@ class S3CourseRepo(CourseRepo):
             Bucket=settings.COURSE_BUCKET,
         )
         return course
+
+    def update_course(self, input_course: dict):
+        print("update_course()", input_course)
+        course = Course(**input_course)
+        print("Course", course)
+        # Write to bucket
+        self.s3.put_object(
+            Body=bytes(course.json(), "utf-8"),
+            Key=f"courses/{course.course_id}.json",
+            Bucket=settings.COURSE_BUCKET,
+        )
+        return course
