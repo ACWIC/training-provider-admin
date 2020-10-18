@@ -40,5 +40,5 @@ def test_save_enrolment(boto_client, uuid4):
     boto_client.return_value.put_object.assert_called_once_with(
         Body=bytes(enrolment.json(), "utf-8"),
         Key=f"{enrolment.uuid}.json",  # NOQA
-        Bucket="some-bucket",
+        Bucket="put-enrolment-auth-bucket-here",
     )
