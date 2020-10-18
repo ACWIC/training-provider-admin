@@ -17,15 +17,7 @@ enrolment_repo = S3EnrolmentRepo()
 
 @router.post("/post_course")
 def post_course(inputs: NewCourseRequest):
-    """
-    The Employer pre-registers a new Enrolment so callbacks can be received
-    The assumption is that the employer generates a unique *enrolment_id*
-    in some source system they control (LMS, HRMS, etc),
-    and registers it with this microservice.
-    This allows the microservice to generate keys,
-    and prepare to receive callbacks from the training provider
-    about this enrolment.
-    """
+    """Create a new Course in Course Catalogue"""
     use_case = CreateNewCourse(course_repo=course_repo)
     response = use_case.execute(inputs)
     return response
@@ -33,14 +25,8 @@ def post_course(inputs: NewCourseRequest):
 
 @router.post("/update_course")
 def update_course(inputs: UpdateCourseRequest):
-    """
-    The Employer pre-registers a new Enrolment so callbacks can be received
-    The assumption is that the employer generates a unique *enrolment_id*
-    in some source system they control (LMS, HRMS, etc),
-    and registers it with this microservice.
-    This allows the microservice to generate keys,
-    and prepare to receive callbacks from the training provider
-    about this enrolment.
+    """Update an existing Course in Course Catalogue
+    course id is mandatory, other attributes are optional
     """
     use_case = UpdateCourse(course_repo=course_repo)
     response = use_case.execute(inputs)
@@ -48,15 +34,9 @@ def update_course(inputs: UpdateCourseRequest):
 
 
 @router.get("/get_course/{course_id}")
-def get_course(course_id: str):  # TODO: typing, return enrolment summary
-    """Return the current status of the given enrolment
-    This relies on certain callbacks
-    with payloads that describe state-changes in the enrolment.
-
-    TODO:
-    * negotiate a state-chart and set of message-types
-      that relate to state changes.
-    * use these message-types to calculate the current state
+def get_course(course_id: str):
+    """Get an existing Course in Course Catalogue
+    using course id
     """
     use_case = GetCourseByID(course_repo=course_repo)
     response = use_case.execute(course_id)

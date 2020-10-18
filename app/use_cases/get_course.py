@@ -8,6 +8,9 @@ class GetCourseByID(BaseModel):
     course_repo: CourseRepo
 
     class Config:
+        # Pydantic will complain if something (course_repo) is defined
+        # as having a non-BaseModel type (e.g. an ABC). Setting this ensures
+        # that it will just check that the value isinstance of this class.
         arbitrary_types_allowed = True
 
     def execute(self, course_id: str):

@@ -16,6 +16,5 @@ def test_enrolment_authorisation_init():
     assert enrolment.uuid == enrolment_id
     assert enrolment.student_id == "1234"
     assert enrolment.course_id == "course-id"
-    # TODO: make a statehart for documentation
     # then test it - probably not lodged unti lodgement!
     assert enrolment.status == ea.EnrolmentStatus.lodged
