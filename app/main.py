@@ -24,10 +24,3 @@ app.add_middleware(
 )
 
 app.include_router(v1_router, prefix=API_GATEWAY_SERVICE_PREFIX)
-
-if __name__ == "__main__":
-    # TODO: could be moved into a separate docs-specific entrypoint as
-    # this is only called to run docs
-    import uvicorn
-
-    uvicorn.run(app)
