@@ -21,8 +21,9 @@ contain information about running
 the software and making changes to it.
 
 There is a test endpoint with a self-documenting API specification 
-[here](https://j7ndza0k1j.execute-api.us-east-1.amazonaws.com/dev/admin/docs)
 
+[Dev](https://wpz8gp45w1.execute-api.us-east-1.amazonaws.com/dev/admin/docs)
+[Prod](https://6l2n6aweqg.execute-api.us-east-1.amazonaws.com/prod/admin/docs)
 
 This is equivalent to what you will have running locally
 if you create a local development environment
