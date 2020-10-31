@@ -2,6 +2,7 @@
 uvicorn==0.11.8
 
 # testing
+requests
 tox
 coverage
 pytest

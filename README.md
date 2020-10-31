@@ -1,83 +1,34 @@
 # Training Provider Admin API
+[![codecov](https://codecov.io/gh/ACWIC/training-provider-admin/branch/main/graph/badge.svg?token=JUR2RGTRN9)](undefined)
+[![CircleCI](https://circleci.com/gh/ACWIC/training-provider-admin.svg?style=svg&circle-token=540486bf1e2e1651b8d860d48a41e2966fd7b936	)](https://circleci.com/gh/circleci/circleci-docs)
 
-This is a FastAPI app that is built to run on AWS Lambda via the API Gateway.
-It is deployed with the `serverless` tool, which manges dealing with AWS. It can
-also run locally with `serverless-offline` in a mode which mimics API Gateway/lambda
-infrastructure. This mode leverages local services like Minio as replacements for 
-AWS resources like S3.
+This is a reference implementation of a proposed API
+enabling Training Providers to interact with Aged Care Providers
+(employers) in a standardised way.
 
-## Installation
+Specifically, it provides the endpoints for the training provider to manage
+their course catalogue, so that customers (Aged Care Providers i.e. employers)
+can search and browse for courses that match their requirements 
+(using the Training Provider Catalogue service), so that they can
+procure training services (using the Training Provider Enrolment service)
 
-Everything is managed with docker-compose. The configuration for this is stored in
-`local.yml`, so it can be convenient to set this in your shell first:
-```
-export COMPOSE_FILE=local.yml
-```
+This is a companion service to 
+- [Training Provider Catalogue](https://github.com/ACWIC/training-provider-catalogue)
+- [Training Provider Enrolment](https://github.com/ACWIC/training-provider-enrolment)
 
-1. `docker-compose build` - build everything
-2. `docker-compose up -d` - run everything in daemon mode
+[DEVELOPMENT.md](DEVELOPMENT.md) and [DEPLOYMENT.md](DEPLOYMENT.md)
+contain information about running
+the software and making changes to it.
 
-There are three components:
-1. serverless
-2. API documentation (via uvicorn/FastAPI directly)
-3. minio
-
-## Configuration
-
-Default configuration is provided under `.envs/.local/`, which includes
-everything required for the components to work together. These variables
-are also used to configure the serverless stages (local, dev).
-
-Serverless additionally needs AWS credentials in order to deploy. This can be provided
-either automatically via the `~/.aws` home directory, which is mounted to the container
-home directory, or via AWS environment variables provided in `.env`.
-
-## Serverless
-
-This component is used to containerise serverless build tooling. It is a python3.8 image
-with node v12.x installed in order to run the serverless CLI tool. Serverless is responsible
-for building and packaging the underlying python app, but also can serve a local version via
-the `offline` command, which is the default command when bringin the container up.
-
-The entrypoint for the container is `serverless`, so this container can be used to do most things
-that the `serverless` CLI tool can.
-
-The `serverless.yml` file is used to configure the CLI, and defines all of the endpoints,
-resources, IAM policies and stages. The configuration file defines stages that map to
-deployed stages (e.g. dev) as well as a local stage which is used to provide configuration
-for serverless-offline.
-
-### Running locally
-```
-docker-compose up -d serverless
-```
-
-This command will run the container in offline mode on port 3000, using `serverless-offline`.
-This plugin mimics the API gateway and lambda context which the deployed code would operate
-in, which is particularly helpful for debugging the interface between code and infrastructure.
-The offline runner uses the API gateway configuration described in serverless.yml (the same that
-is used to deploy with).
-
-**A note about local resources**
-
-Serverless will not auto-create S3 buckets in minio, so this must be done manually first.
-
-### Deploying
-```
-docker-compose run --rm serverless deploy --stage dev
-```
-
-This command packages the app with configuration defined in the serverless dev stage. Serverless
-will use AWS credentials in one of two locations:
-- in the user's aws directory `~/.aws`
-- a `.env` with the following variables defined:
-  - `AWS_ACCESS_KEY_ID`
-  - `AWS_SECRET_ACCESS_KEY`
+There is a test endpoint with a self-documenting API specification 
+[here](https://j7ndza0k1j.execute-api.us-east-1.amazonaws.com/dev/admin/docs)
 
 
-## Tests
+This is equivalent to what you will have running locally
+if you create a local development environment
+(per [DEVELOPMENT.md](DEVELOPMENT.md))
 
-Tests are run with pytest, which can be executed with the following command:
-```
-docker-compose run --rm test
-```
+The test endpoint is continuously deployed
+from the `main` branch in this repository, so should be considered unstable.
+It is also completely open (do not require authentication),
+which is not a realistic simulation of any kind of production environment.

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     S3_ENDPOINT_URL: Optional[str]
     ENROLMENT_BUCKET: str
     CALLBACK_BUCKET: str
+    ENROLMENT_AUTHORISATION_BUCKET: str
     COURSE_BUCKET: str
 
     @functools.cached_property
