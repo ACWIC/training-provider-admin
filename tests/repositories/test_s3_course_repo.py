@@ -5,14 +5,17 @@ The are testing the encapsulation of the "impure" code
 the repos should return pure domain objects
 of the appropriate type.
 """
-from unittest.mock import patch
+import datetime
+from unittest import mock
 
 from app.config import settings
 from app.repositories.s3_course_repo import S3CourseRepo
 from tests.test_data.course_data_provider import CourseDataProvider
 
+# from unittest.mock import mock.patch
 
-@patch("boto3.client")
+
+@mock.patch("boto3.client")
 def test_s3_initialisation(boto_client):
     """
     Ensure the S3CourseRepo makes a boto3 connection.
@@ -21,31 +24,20 @@ def test_s3_initialisation(boto_client):
     boto_client.assert_called_once()
 
 
-@patch("boto3.client")
-def test_save_course(boto_client):
-    """
-    Ensure the S3CourseRepo returns an object with OK data
-    and that an appropriate boto3 put call was made.
-    """
-    course_id = CourseDataProvider().sample_course_id
-    date = CourseDataProvider().sample_course_date
+@mock.patch("app.utils.random.Random.get_uuid")
+@mock.patch("boto3.client")
+def test_save_course(boto_client, get_uuid):
     repo = S3CourseRepo()
     settings.COURSE_BUCKET = "some-bucket"
-    params = CourseDataProvider().sample_course_dict
+    course_id = CourseDataProvider().sample_course_id
+    request = CourseDataProvider().sample_create_course_request
 
-    course = repo.create_course(input_course=params)
+    get_uuid.return_value = CourseDataProvider().sample_course_id
+    with mock_datetime_now(CourseDataProvider().created, datetime):
+        course = repo.create_course(request)
 
-    assert course.course_id == course_id
-    assert course.course_name == "Bachelor of Community Services (HE20528)"
-    assert course.industry_standards == "Police Check"
-    assert course.competency == "top rated"
-    assert course.location == "Sydney"
-    assert course.date == date
-    assert course.availability is True
-    assert course.hours_per_week == 10
-    assert course.duration == "2 months"
-    assert course.fees_from == 200
-    assert course.created == date
+    print(course, CourseDataProvider().sample_course)
+    assert course == CourseDataProvider().sample_course
 
     boto_client.return_value.put_object.assert_called_once_with(
         Body=bytes(course.json(), "utf-8"),
@@ -54,34 +46,19 @@ def test_save_course(boto_client):
     )
 
 
-@patch("app.repositories.s3_course_repo.S3CourseRepo.get_course")
-@patch("boto3.client")
+@mock.patch("app.repositories.s3_course_repo.S3CourseRepo.get_course")
+@mock.patch("boto3.client")
 def test_update_course(boto_client, repo_get_course):
-    """
-    Ensure the S3CourseRepo returns an object with OK data
-    and that an appropriate boto3 put call was made.
-    """
     course_id = CourseDataProvider().sample_course_id
-    date = CourseDataProvider().sample_course_date
     repo = S3CourseRepo()
     settings.COURSE_BUCKET = "some-bucket"
-    course = CourseDataProvider().sample_course
-    params = CourseDataProvider().sample_update_course_request_dict
+    sample_course = CourseDataProvider().sample_course
+    params = CourseDataProvider().sample_update_course_request
 
-    repo_get_course.return_value = course
+    repo_get_course.return_value = sample_course
     course = repo.update_course(params)
 
-    assert course.course_id == course_id
-    assert course.course_name == "Bachelor of Community Services (HE20528)"
-    assert course.industry_standards == "Police Check"
-    assert course.competency == "top rated"
-    assert course.location == "Sydney"
-    assert course.date == date
-    assert course.availability is True
-    assert course.hours_per_week == 10
-    assert course.duration == "2 months"
-    assert course.fees_from == 200
-    assert course.created == date
+    assert course == sample_course
 
     boto_client.return_value.put_object.assert_called_once_with(
         Body=bytes(course.json(), "utf-8"),
@@ -90,35 +67,53 @@ def test_update_course(boto_client, repo_get_course):
     )
 
 
-@patch("json.loads")
-@patch("boto3.client")
+@mock.patch("json.loads")
+@mock.patch("boto3.client")
 def test_get_course(boto_client, json_loads):
-    """
-    Ensure the S3CourseRepo returns an object with OK data
-    and that an appropriate boto3 put call was made.
-    """
     course_id = CourseDataProvider().sample_course_id
-    date = CourseDataProvider().sample_course_date
     repo = S3CourseRepo()
     settings.COURSE_BUCKET = "some-bucket"
-    course = CourseDataProvider().sample_course_dict
+    sample_course = CourseDataProvider().sample_course
 
-    json_loads.return_value = course
+    json_loads.return_value = sample_course.dict()
     course = repo.get_course(course_id)
 
-    assert course.course_id == course_id
-    assert course.course_name == "Bachelor of Community Services (HE20528)"
-    assert course.industry_standards == "Police Check"
-    assert course.competency == "top rated"
-    assert course.location == "Sydney"
-    assert course.date == date
-    assert course.availability is True
-    assert course.hours_per_week == 10
-    assert course.duration == "2 months"
-    assert course.fees_from == 200
-    assert course.created == date
+    assert course == sample_course
 
     boto_client.return_value.get_object.assert_called_once_with(
         Key=f"courses/{course_id}.json",
         Bucket="some-bucket",
     )
+
+
+def mock_datetime_now(target, datetime_module):
+    """Override ``datetime.datetime.now()`` with a custom target value.
+    This creates a new datetime.datetime class, and alters its now()/utcnow()
+    methods.
+    Returns:
+        A mock.mock.mock.patch context, can be used as a decorator or in a with.
+    """
+    real_datetime_class = datetime.datetime
+
+    class DatetimeSubclassMeta(type):
+        """We need to customize the __instancecheck__ method for isinstance().
+        This must be performed at a metaclass level.
+        """
+
+        @classmethod
+        def __instancecheck__(mcs, obj):
+            return isinstance(obj, real_datetime_class)
+
+    class BaseMockedDatetime(real_datetime_class):
+        @classmethod
+        def now(cls, tz=None):
+            return target.replace(tzinfo=tz)
+
+        @classmethod
+        def utcnow(cls):
+            return target
+
+    # Python2 & Python3-compatible metaclass
+    MockedDatetime = DatetimeSubclassMeta("datetime", (BaseMockedDatetime,), {})
+
+    return mock.patch.object(datetime_module, "datetime", MockedDatetime)

@@ -6,10 +6,10 @@ from pydantic import BaseModel
 class Course(BaseModel):
     course_id: str
     course_name: str
-    industry_standards: str
-    competency: str
+    industry_standards: list
+    competency: list
     location: str
-    date: datetime
+    start_date: datetime
     availability: bool
     hours_per_week: float
     duration: str
