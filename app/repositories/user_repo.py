@@ -1,5 +1,5 @@
 import abc
-from datetime import datetime, timedelta
+import datetime
 from typing import Any, Union
 
 from fastapi import Depends
@@ -13,12 +13,12 @@ from app.security import oauth2_scheme, pwd_context
 class UserRepo(abc.ABC):
     @staticmethod
     def create_access_token(
-        subject: Union[str, Any], expires_delta: timedelta = None
+        subject: Union[str, Any], expires_delta: datetime.timedelta = None
     ) -> str:
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            expire = datetime.datetime.utcnow() + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(
+            expire = datetime.datetime.utcnow() + datetime.timedelta(
                 minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
             )
         to_encode = {"exp": expire, "sub": str(subject)}

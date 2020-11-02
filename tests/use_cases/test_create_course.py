@@ -23,7 +23,7 @@ def test_create_course_success():
     repo.create_course.return_value = course
     response = use_case.execute(request)
 
-    assert response.type == SuccessType.SUCCESS
+    assert response.type == SuccessType.CREATED
 
 
 def test_create_course_failure():

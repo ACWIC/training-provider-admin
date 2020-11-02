@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.repositories.s3_course_repo import S3CourseRepo
 from app.repositories.s3_enrolment_repo import S3EnrolmentRepo
 from app.requests.create_course_request import NewCourseRequest
 from app.requests.enrolment_requests import NewEnrolmentRequest
 from app.requests.update_course_request import UpdateCourseRequest
+from app.security import oauth2_scheme
 from app.use_cases.create_course import CreateNewCourse
 from app.use_cases.create_new_enrolment import CreateNewEnrolment
 from app.use_cases.get_course import GetCourseByID
@@ -16,7 +17,7 @@ enrolment_repo = S3EnrolmentRepo()
 
 
 @router.post("/post_course")
-def post_course(inputs: NewCourseRequest):
+def post_course(inputs: NewCourseRequest, token: str = Depends(oauth2_scheme)):
     """Create a new Course in Course Catalogue"""
     use_case = CreateNewCourse(course_repo=course_repo)
     response = use_case.execute(inputs)
@@ -24,7 +25,7 @@ def post_course(inputs: NewCourseRequest):
 
 
 @router.post("/update_course")
-def update_course(inputs: UpdateCourseRequest):
+def update_course(inputs: UpdateCourseRequest, token: str = Depends(oauth2_scheme)):
     """Update an existing Course in Course Catalogue
     course id is mandatory, other attributes are optional
     """
@@ -34,7 +35,7 @@ def update_course(inputs: UpdateCourseRequest):
 
 
 @router.get("/get_course/{course_id}")
-def get_course(course_id: str):
+def get_course(course_id: str, token: str = Depends(oauth2_scheme)):
     """Get an existing Course in Course Catalogue
     using course id
     """
@@ -44,7 +45,7 @@ def get_course(course_id: str):
 
 
 @router.get("/enrolments/{enrolment_id}")
-def enrolments(enrolment_id: str):
+def enrolments(enrolment_id: str, token: str = Depends(oauth2_scheme)):
     """Getting an enrollment by ID will return the current
     state of the enrollment, derived from the enrollment’s journal.
     """
@@ -52,7 +53,7 @@ def enrolments(enrolment_id: str):
 
 
 @router.post("/enrolments")
-def create_enrolment(inputs: NewEnrolmentRequest):
+def create_enrolment(inputs: NewEnrolmentRequest, token: str = Depends(oauth2_scheme)):
     """Posting an enrollment authorisation is a synchronous proccess that
     immediately succeeds (or fails) to create an enrollment authorisation,
     and assign it a unique enrollment authorisation id.

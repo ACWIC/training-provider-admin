@@ -1,7 +1,7 @@
 STAGE = dev  # this is the environment we deploy to
 
 test:
-	docker-compose -f local.yml run --rm app python -m pytest
+	docker-compose -f local.yml run --rm app python -m pytest -s
 
 build:
 	docker-compose -f local.yml build
