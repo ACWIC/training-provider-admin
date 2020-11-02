@@ -4,6 +4,7 @@ These tests evaluate (and document) the business logic.
 from unittest import mock
 
 from app.repositories.course_repo import CourseRepo
+from app.responses import FailureType, SuccessType
 from app.use_cases.create_course import CreateNewCourse
 from tests.test_data.course_data_provider import CourseDataProvider
 
@@ -22,7 +23,7 @@ def test_create_course_success():
     repo.create_course.return_value = course
     response = use_case.execute(request)
 
-    assert response.type == "Success"
+    assert response.type == SuccessType.SUCCESS
 
 
 def test_create_course_failure():
@@ -38,4 +39,4 @@ def test_create_course_failure():
 
     response = use_case.execute(request)
 
-    assert response.type == "ResourceError"
+    assert response.type == FailureType.RESOURCE_ERROR
