@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 import boto3
@@ -16,12 +17,30 @@ class S3UserRepo(UserRepo):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.s3 = boto3.client("s3", **settings.s3_configuration)
+        with handle_s3_errors():
+            self.s3 = boto3.client("s3", **settings.s3_configuration)
+
+    def create_user(self, user_dict: dict) -> User:
+        password = user_dict.pop("password", None)
+        user_dict["hashed_password"] = self.get_password_hash(password)
+        user = User(**user_dict)
+        with handle_s3_errors():
+            self.s3.put_object(  # Write to bucket
+                Body=user.serialize(),
+                Key=f"users/{user.username}.json",
+                Bucket=settings.USER_BUCKET,
+            )
+
+        return user
 
     def get_user(self, username: str):
         with handle_s3_errors():
-            user_dict = self.s3.get_object("XXX")
-        return User(**user_dict)
+            user_obj = self.s3.get_object(
+                Key=f"users/{username}.json", Bucket=settings.USER_BUCKET
+            )
+
+        user = User(**json.loads(user_obj["Body"].read().decode()))
+        return user
 
     def authenticate_user(self, username: str, password: str):
         user = self.get_user(username)

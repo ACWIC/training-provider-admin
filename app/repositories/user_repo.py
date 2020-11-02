@@ -2,10 +2,12 @@ import abc
 from datetime import datetime, timedelta
 from typing import Any, Union
 
+from fastapi import Depends
 from jose import jwt
 
 from app.config import settings
-from app.security import pwd_context
+from app.domain.entities.user import User
+from app.security import oauth2_scheme, pwd_context
 
 
 class UserRepo(abc.ABC):
@@ -32,3 +34,25 @@ class UserRepo(abc.ABC):
     @staticmethod
     def get_password_hash(password: str) -> str:
         return pwd_context.hash(password)
+
+    @abc.abstractmethod
+    def create_user(self, user_dict: dict) -> User:
+        """"""
+
+    @abc.abstractmethod
+    def get_user(self, username: str):
+        """"""
+
+    @abc.abstractmethod
+    def authenticate_user(self, username: str, password: str):
+        """"""
+
+    @abc.abstractmethod
+    async def get_current_user(self, token: str = Depends(oauth2_scheme)):
+        """"""
+
+    @abc.abstractmethod
+    async def get_current_active_user(
+        self, current_user: User = Depends(get_current_user)
+    ):
+        """"""

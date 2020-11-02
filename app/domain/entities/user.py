@@ -13,6 +13,7 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
+    user_id: str
     username: str
     email: Optional[str] = None
     full_name: Optional[str] = None
@@ -20,3 +21,6 @@ class User(BaseModel):
     hashed_password: str
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
+
+    def serialize(self):
+        return bytes(self.json(), "utf-8")
