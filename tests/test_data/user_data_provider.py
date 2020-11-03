@@ -18,6 +18,7 @@ class UserDataProvider:
         self.email = "test@email.com"
         self.full_name = "Test Client"
         self.username = "TestClient"
+        self.subject = {"sub": self.username}
         date_time_str = "2018-06-29 08:15:27.243860"
         date = datetime.datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S.%f")
         self.date = date

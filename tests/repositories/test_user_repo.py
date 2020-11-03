@@ -9,19 +9,19 @@ test_data = UserDataProvider()
 
 
 def test_create_access_token():
-    token = repo.create_access_token(test_data.username)
+    token = repo.create_access_token(test_data.subject)
     time.sleep(1)
-    token_2 = repo.create_access_token(test_data.username)
+    token_2 = repo.create_access_token(test_data.subject)
     assert len(token) == 131
     assert token != token_2
 
 
 def test_create_access_token_with_expire():
     expire = datetime.timedelta(seconds=60)
-    token_with_expired = repo.create_access_token(test_data.username, expire)
-    token = repo.create_access_token(test_data.username)
+    token_with_expired = repo.create_access_token(test_data.subject, expire)
+    token = repo.create_access_token(test_data.subject)
     time.sleep(1)
-    token_with_expired_2 = repo.create_access_token(test_data.username, expire)
+    token_with_expired_2 = repo.create_access_token(test_data.subject, expire)
 
     assert len(token_with_expired) == 131
     assert token_with_expired != token
