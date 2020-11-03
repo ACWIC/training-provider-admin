@@ -24,8 +24,6 @@ class ResponseFailure(BaseModel):
 
     @classmethod
     def _format_message(cls, message):
-        # if isinstance(message, Exception):
-        #     return f"{message.__class__.__name__}: {message}"
         return message
 
     def __bool__(self):
