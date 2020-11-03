@@ -13,5 +13,5 @@ deploy_lambda:
 	zip -g function.zip handler.py
 	aws lambda update-function-code --function-name training-provider-api-$(STAGE)-admin --zip-file fileb://function.zip
 
-run:
+up:
 	docker-compose -f local.yml up

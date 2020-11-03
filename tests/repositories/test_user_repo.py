@@ -1,7 +1,7 @@
 import datetime
+import time
 
 from app.repositories.s3_user_repo import S3UserRepo
-from tests.repositories.test_s3_course_repo import mock_datetime_now
 from tests.test_data.user_data_provider import UserDataProvider
 
 repo = S3UserRepo()
@@ -9,30 +9,31 @@ test_data = UserDataProvider()
 
 
 def test_create_access_token():
-    with mock_datetime_now(test_data.date, datetime):
-        token = repo.create_access_token(test_data.username)
-    print(token)
-    assert (
-        token
-        == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzAyNjE5MjcsInN1YiI6IlRlc3RDbGllbnQifQ"
-        ".xeOieix-mS714WxfM7lQ96t-n8QikivVrL2gC4mjzMA"
-    )
+    token = repo.create_access_token(test_data.username)
+    time.sleep(1)
+    token_2 = repo.create_access_token(test_data.username)
+    assert len(token) == 131
+    assert token != token_2
 
 
 def test_create_access_token_with_expire():
     expire = datetime.timedelta(seconds=60)
-    with mock_datetime_now(test_data.date, datetime):
-        token = repo.create_access_token(test_data.username, expire)
-    print(token)
-    assert (
-        token
-        == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzAyNjAxODcsInN1YiI6IlRlc3RDbGllbnQifQ"
-        ".63y_69haryN2JuoqzBJ7GeNOmk2EVoI3rXhhGdI-_ss"
-    )
+    token_with_expired = repo.create_access_token(test_data.username, expire)
+    token = repo.create_access_token(test_data.username)
+    time.sleep(1)
+    token_with_expired_2 = repo.create_access_token(test_data.username, expire)
+
+    assert len(token_with_expired) == 131
+    assert token_with_expired != token
+    assert token_with_expired != token_with_expired_2
 
 
 def verify_password():
-    assert repo.verify_password(test_data.password, test_data.hashed_password) is True
+    verify = repo.verify_password(test_data.password, test_data.hashed_password)
+    assert verify is True
+
+    verify = repo.verify_password("random_password", test_data.hashed_password)
+    assert verify is False
 
 
 def hash_password():
