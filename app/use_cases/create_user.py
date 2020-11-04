@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from app.repositories.user_repo import UserRepo
 from app.requests.user_requests import CreateUserRequest
-from app.responses import ResponseFailure, ResponseSuccess
+from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 from app.utils import Random
 
 
@@ -20,8 +20,10 @@ class CreateNewUser(BaseModel):
         create_user_dict["user_id"] = str(Random.get_uuid())
 
         try:
-            course = self.user_repo.create_user(user_dict=create_user_dict)
+            user = self.user_repo.create_user(user_dict=create_user_dict)
+            code = SuccessType.CREATED
+            message = "User has been created."
         except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 
-        return ResponseSuccess(value=course)
+        return ResponseSuccess(value=user, type=code, message=message)

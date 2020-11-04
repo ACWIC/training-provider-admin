@@ -1,8 +1,11 @@
 import datetime
 
-from app.domain.entities.user import User
+from fastapi.security import OAuth2PasswordRequestForm
+
+from app.domain.entities.user import Token, User
 from app.repositories.s3_user_repo import S3UserRepo
 from app.requests.user_requests import CreateUserRequest
+from app.responses import ResponseFailure
 
 
 class UserDataProvider:
@@ -43,4 +46,20 @@ class UserDataProvider:
             disabled=False,
             is_active=True,
             is_superuser=False,
+        )
+
+        self.password_request_form = OAuth2PasswordRequestForm(
+            username=self.username, password=self.password, scope=""
+        )
+
+        self.encoded_jwt = (
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0Q2xpZW50IiwiZXhwIjoxNjA0NTE1NTYwf"
+            "Q.EJ8k8KrE1zvJNKlPHl1wHB7Rh9Mz82E_bROzTjl1QdY"
+        )
+
+        self.token = Token(access_token=self.encoded_jwt, token_type="bearer")
+        self.jwt_decode_return_false = {}
+        self.jwt_decode_return_success = {"sub": "TestClient"}
+        self.credentials_exception = ResponseFailure.build_from_unauthorised_error(
+            message="Could not validate credentials"
         )

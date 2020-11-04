@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from app.config import settings
 from app.domain.entities.user import Token
 from app.repositories.user_repo import UserRepo
-from app.responses import ResponseFailure, ResponseSuccess
+from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
 class CreateAccessToken(BaseModel):
@@ -31,7 +31,9 @@ class CreateAccessToken(BaseModel):
                 subject={"sub": user.username}, expires_delta=access_token_expires
             )
             token = Token(access_token=access_token, token_type="bearer")
+            code = SuccessType.CREATED
+            message = "Token is created."
         except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 
-        return ResponseSuccess(value=token)
+        return ResponseSuccess(value=token, type=code, message=message)

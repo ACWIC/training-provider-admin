@@ -20,17 +20,21 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         )
         username = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            return credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
-        raise credentials_exception
+        return credentials_exception
     user = repo.get_user(username=token_data.username)
     if user is None:
-        raise credentials_exception
+        return credentials_exception
     return user
 
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if isinstance(current_user, ResponseFailure):
+        failed_response = current_user
+        return failed_response
+
     if current_user.disabled:
         return ResponseFailure.build_from_resource_error(message="Inactive user")
 

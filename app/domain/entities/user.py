@@ -1,6 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from app.utils import Random
 
 
 class Token(BaseModel):
@@ -13,7 +15,7 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
-    user_id: str
+    user_id: str = Field(default_factory=Random().get_uuid)
     username: str
     email: Optional[str] = None
     full_name: Optional[str] = None
