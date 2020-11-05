@@ -4,7 +4,6 @@ import pytest
 from jose import JWTError
 
 import app.use_cases.get_current_active_user as uc
-from app.repositories.s3_user_repo import S3UserRepo
 from app.responses import FailureType
 from tests.test_data.user_data_provider import UserDataProvider
 
@@ -13,15 +12,15 @@ test_data = UserDataProvider()
 
 @pytest.mark.asyncio
 @mock.patch("app.use_cases.get_current_active_user.jwt")
-def test_get_current_user_success(jwt, event_loop):
+@mock.patch("app.use_cases.get_current_active_user.repo")
+def test_get_current_user_success(repo, jwt, event_loop):
     """
     When creating a new user,
     if everything goes according to plan,
     the response type should be "Success".
     """
     jwt.decode.return_value = test_data.jwt_decode_return_success
-    repo = mock.Mock(spec=S3UserRepo)
-    repo.return_value.get_user = test_data.sample_user
+    repo.get_user.return_value = test_data.sample_user
     user = event_loop.run_until_complete(uc.get_current_user())
 
     assert user.username == test_data.username
