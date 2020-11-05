@@ -30,18 +30,12 @@ def test_create_access_token_with_expire():
     assert token_with_expired != token_with_expired_2
 
 
-def verify_password():
+def test_verify_password():
     verify = repo.verify_password(test_data.password, test_data.hashed_password)
     assert verify is True
 
     verify = repo.verify_password("random_password", test_data.hashed_password)
     assert verify is False
-
-
-def hash_password():
-    assert repo.get_password_hash(test_data.password) == repo.get_password_hash(
-        test_data.password
-    )
 
 
 @mock.patch("boto3.client")
@@ -73,24 +67,38 @@ def test_get_user(boto_client, json_loads):
     )
 
 
-def authenticate_user_get_user_false():
-    rep = mock.Mock(spec=S3UserRepo)
-    rep.return_value.get_user = None
-    assert rep.authenticate_user(test_data.username, test_data.password) is False
+def test_authenticate_user_get_user_false():
+    with mock.patch.object(S3UserRepo, "get_user") as mocked_get_user:
+        mocked_get_user.return_value = None
+        assert (
+            S3UserRepo().authenticate_user(test_data.username, test_data.password)
+            is False
+        )
 
 
-def authenticate_user_verify_password_false():
-    rep = mock.Mock(spec=S3UserRepo)
-    rep.return_value.get_user = test_data.sample_user
-    rep.return_value.verify_password = False
-    assert rep.authenticate_user(test_data.username, test_data.password) is False
+def test_authenticate_user_verify_password_false():
+    with mock.patch.object(
+        S3UserRepo, "get_user"
+    ) as mocked_get_user, mock.patch.object(
+        S3UserRepo, "verify_password"
+    ) as mocked_verify_password:
+        mocked_get_user.return_value = test_data.sample_user
+        mocked_verify_password.return_value = False
+        assert (
+            S3UserRepo().authenticate_user(test_data.username, test_data.password)
+            is False
+        )
 
 
-def authenticate_user_success():
-    rep = mock.Mock(spec=S3UserRepo)
-    rep.return_value.get_user = test_data.sample_user
-    rep.return_value.verify_password = True
-    assert (
-        rep.authenticate_user(test_data.username, test_data.password)
-        == test_data.sample_user
-    )
+def test_authenticate_user_success():
+    with mock.patch.object(
+        S3UserRepo, "get_user"
+    ) as mocked_get_user, mock.patch.object(
+        S3UserRepo, "verify_password"
+    ) as mocked_verify_password:
+        mocked_get_user.return_value = test_data.sample_user
+        mocked_verify_password.return_value = True
+        assert (
+            S3UserRepo().authenticate_user(test_data.username, test_data.password)
+            == test_data.sample_user
+        )

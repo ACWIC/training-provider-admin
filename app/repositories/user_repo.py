@@ -32,7 +32,7 @@ class UserRepo(abc.ABC):
 
     @staticmethod
     def get_password_hash(password: str) -> str:
-        return pwd_context.hash(password)
+        return pwd_context.hash(password)  # noqa
 
     @abc.abstractmethod
     def create_user(self, user_dict: dict) -> User:
