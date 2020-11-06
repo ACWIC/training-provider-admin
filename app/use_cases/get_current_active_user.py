@@ -16,14 +16,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.SECRET_TOKEN_KEY, algorithms=[settings.ALGORITHM]
         )
-        username = payload.get("sub")
-        if username is None:
-            return credentials_exception
-        token_data = TokenData(username=username)
     except JWTError:
         return credentials_exception
+    username = payload.get("sub")
+    if username is None:
+        return credentials_exception
+    token_data = TokenData(username=username)
     user = repo.get_user(username=token_data.username)
     if user is None:
         return credentials_exception

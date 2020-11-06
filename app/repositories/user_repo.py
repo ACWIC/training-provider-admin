@@ -1,7 +1,7 @@
 import abc
 import datetime
 
-from jose import jwt
+from jose import JWTError, jwt
 
 from app.config import settings
 from app.domain.entities.user import User
@@ -21,9 +21,14 @@ class UserRepo(abc.ABC):
                 minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
             )
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(
-            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-        )
+        try:
+            encoded_jwt = jwt.encode(
+                to_encode, settings.SECRET_TOKEN_KEY, algorithm=settings.ALGORITHM
+            )
+        except JWTError as e:
+            raise Exception(
+                f"JWT Encoding Error. Please check the full error message: {e}"
+            )
         return encoded_jwt
 
     @staticmethod

@@ -27,7 +27,6 @@ class S3UserRepo(UserRepo):
                 Key=f"users/{user.username}.json",
                 Bucket=settings.USER_BUCKET,
             )
-
         return user
 
     def get_user(self, username: str):
@@ -35,7 +34,6 @@ class S3UserRepo(UserRepo):
             user_obj = self.s3.get_object(
                 Key=f"users/{username}.json", Bucket=settings.USER_BUCKET
             )
-
         user = User(**json.loads(user_obj["Body"].read().decode()))
         return user
 
