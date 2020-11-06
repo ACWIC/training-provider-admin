@@ -20,7 +20,7 @@ class CourseDataProvider:  # (BaseModel):
         course_id = "1dad3dd8-af28-4e61-ae23-4c93a456d10e"
         date_time_str = "2018-06-29 08:15:27.243860"
         date = datetime.datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S.%f")
-        created = date
+        self.created = date
         self.sample_course_id = course_id
         self.sample_course_date = date
 
@@ -36,7 +36,7 @@ class CourseDataProvider:  # (BaseModel):
             hours_per_week=10,
             duration="2 months",
             fees_from=200,
-            created=created,
+            created=self.created,
         )
         self.sample_course_dict = vars(self.sample_course)
 

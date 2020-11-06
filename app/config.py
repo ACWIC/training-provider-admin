@@ -1,5 +1,6 @@
 import functools
 import logging
+import secrets
 from typing import Optional
 
 from pydantic import BaseSettings
@@ -14,6 +15,10 @@ class Settings(BaseSettings):
     S3_ENDPOINT_URL: Optional[str]
     ENROLMENT_AUTHORISATION_BUCKET: str
     COURSE_BUCKET: str
+    USER_BUCKET: str
+    SECRET_TOKEN_KEY: str = secrets.token_urlsafe(32)
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     @functools.cached_property
     def s3_configuration(self) -> dict:

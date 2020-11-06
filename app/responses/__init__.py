@@ -1,12 +1,21 @@
 from enum import Enum
 
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from pydantic.typing import Literal
+from starlette.responses import JSONResponse
 
 
-class FailureType(str, Enum):
-    RESOURCE_ERROR = "ResourceError"
-    SYSTEM_ERROR = "SystemError"
+class SuccessType(int, Enum):
+    SUCCESS = 200
+    CREATED = 201
+
+
+class FailureType(int, Enum):
+    PARAMETER_ERROR = 400
+    UNAUTHORISED_ERROR = 401
+    RESOURCE_ERROR = 404
+    VALIDATION_ERROR = 422
+    SYSTEM_ERROR = 500
 
 
 class ResponseFailure(BaseModel):
@@ -32,10 +41,29 @@ class ResponseFailure(BaseModel):
     def build_from_system_error(cls, message=None):
         return cls(type=FailureType.SYSTEM_ERROR, message=cls._format_message(message))
 
+    @classmethod
+    def build_from_validation_error(cls, message=None):
+        return cls(
+            type=FailureType.VALIDATION_ERROR, message=cls._format_message(message)
+        )
+
+    @classmethod
+    def build_from_unauthorised_error(cls, message=None):
+        return cls(
+            type=FailureType.UNAUTHORISED_ERROR, message=cls._format_message(message)
+        )
+
 
 class ResponseSuccess(BaseModel):
-    type: Literal["Success"] = "Success"
     value: dict
+    type: SuccessType = SuccessType.SUCCESS
+    message: str = "Success"
 
     def __bool__(self):
         return True
+
+    def build(self):
+        content = jsonable_encoder(
+            {"value": self.value, "message": self.message, "type": self.type}
+        )
+        return JSONResponse(content=content, status_code=self.type.value)
