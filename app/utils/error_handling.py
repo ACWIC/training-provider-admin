@@ -12,7 +12,6 @@ def handle_s3_errors():
     try:
         yield
     except ClientError as error:
-        print("code", error.response["Error"]["Code"])
         if error.response["Error"]["Code"] == "NoSuchKey":
             raise S3Exception(
                 "Object with the specified key doesn't exist in the bucket."

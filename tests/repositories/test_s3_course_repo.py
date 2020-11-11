@@ -1,10 +1,3 @@
-"""
-These tests evaluate the interaction with the backing PaaS.
-The are testing the encapsulation of the "impure" code
-(in a functional sense),
-the repos should return pure domain objects
-of the appropriate type.
-"""
 import datetime
 from unittest import mock
 

@@ -42,10 +42,3 @@ def test_response_success_build():
     json_response = response.build()
     assert b'{"value":{"test":"123"}' in json_response.body
     assert json_response.status_code == SuccessType.SUCCESS.value
-
-
-def test_response_failure_build_with_exception():
-    response = ResponseFailure.build_from_unauthorised_error(
-        message=Exception("unauthorised error test")
-    )
-    assert response.type == FailureType.UNAUTHORISED_ERROR
