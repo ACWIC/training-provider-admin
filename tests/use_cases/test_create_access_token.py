@@ -58,4 +58,4 @@ def test_create_access_token_authentication_failure():
     response = use_case.execute(form_data)
 
     assert response.type == FailureType.UNAUTHORISED_ERROR
-    assert response.message == "Incorrect username or password"
+    assert response.message == "UNAUTHORISED_ERROR: Incorrect username or password"

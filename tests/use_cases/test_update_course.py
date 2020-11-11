@@ -26,6 +26,18 @@ def test_update_course_success():
     assert response.type == SuccessType.SUCCESS
 
 
+def test_update_course_not_exists():
+    repo = mock.Mock(spec=CourseRepo)
+    repo.course_exists.return_value = False
+    repo.get_course.return_value = CourseDataProvider().sample_course
+    request = CourseDataProvider().sample_update_course_request
+
+    use_case = UpdateCourse(course_repo=repo)
+    response = use_case.execute(request)
+
+    assert response.type == FailureType.VALIDATION_ERROR
+
+
 def test_update_course_failure():
     """
     When updating a course,

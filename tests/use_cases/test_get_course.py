@@ -26,6 +26,18 @@ def test_get_course_success():
     assert response.type == SuccessType.SUCCESS
 
 
+def test_get_course_not_exists():
+    repo = mock.Mock(spec=CourseRepo)
+    course_id = CourseDataProvider().sample_course_id
+    repo.course_exists.return_value = False
+    repo.get_course.return_value = CourseDataProvider().sample_course
+
+    use_case = GetCourseByID(course_repo=repo)
+    response = use_case.execute(course_id)
+
+    assert response.type == FailureType.VALIDATION_ERROR
+
+
 def test_get_course_failure():
     """
     When getting a course,

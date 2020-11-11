@@ -58,7 +58,7 @@ def test_get_current_user_username_faiure(jwt, event_loop):
     response = event_loop.run_until_complete(uc.get_current_user())
 
     assert response.type == FailureType.UNAUTHORISED_ERROR
-    assert response.message == "Could not validate credentials"
+    assert response.message == "UNAUTHORISED_ERROR: Could not validate credentials"
 
 
 @pytest.mark.asyncio
@@ -73,4 +73,4 @@ def test_get_current_user_jwt_decode_failure(jwt, event_loop):
     response = event_loop.run_until_complete(uc.get_current_user())
 
     assert response.type == FailureType.UNAUTHORISED_ERROR
-    assert response.message == "Could not validate credentials"
+    assert response.message == "UNAUTHORISED_ERROR: Could not validate credentials"

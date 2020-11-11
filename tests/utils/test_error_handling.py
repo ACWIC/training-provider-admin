@@ -12,7 +12,9 @@ def test_client_error():
 
     assert (
         str(exception.value)
-        == "Client Error!\nPlease check the error code and message below.\nCode: 123\nMessage: Test Message"
+        == "Client Error!"
+        + "\nPlease check the error code and message below."
+        + "\nCode: 123\nMessage: Test Message"
     )
 
 
@@ -35,7 +37,8 @@ def test_parameter_validation_error():
 
     assert (
         str(exception.value)
-        == "The parameters you provided are incorrect: Parameter validation failed:\nTest"
+        == "The parameters you provided are incorrect: "
+        + "Parameter validation failed:\nTest"
     )
 
 
@@ -46,7 +49,8 @@ def test_botocore_error():
 
     assert (
         str(exception.value)
-        == "BotoCoreError! Please check the error message: An unspecified error occurred"
+        == "BotoCoreError! Please check the error message: "
+        + "An unspecified error occurred"
     )
 
 
@@ -57,5 +61,6 @@ def test_unknown_error():
 
     assert (
         str(exception.value)
-        == "Unknown Error! This might be a Python Error.\nPlease check the error message: Random Error"
+        == "Unknown Error! This might be a Python Error."
+        + "\nPlease check the error message: Random Error"
     )

@@ -1,7 +1,3 @@
-import os
-
-from fastapi.testclient import TestClient
-
 from app.config import Settings
 
 
@@ -24,19 +20,3 @@ def test_s3_config_returns_correct_settings_when_env_vars_exist():
         "aws_secret_access_key": "secret_key",
         "endpoint_url": "s3.com",
     }
-
-
-def test_app_docs_url():
-    """
-    We know that the STAGE_PREFIX only works for the browser, and thus
-    we don't add it in the URL check we do here.
-    For more info, read the fastapi.FastAPI documentation
-    """
-    os.environ["STAGE_PREFIX"] = "/dev"
-    os.environ["SERVICE_PREFIX"] = "/admin"
-
-    from app.main import app
-
-    client = TestClient(app)
-    response = client.get("/admin/docs")
-    assert response.status_code == 200

@@ -14,22 +14,22 @@ def test_update_course_request():
     request = UpdateCourseRequest(
         course_id=course_id,
         course_name="Bachelor of Community Services (HE20528)",
-        industry_standards="Police Check",
-        competency="top rated",
+        industry_standards=["Police Check", "Security check"],
+        competency=["top rated", "experienced"],
         location="Sydney",
-        date=date,
+        start_date=date,
         availability=True,
         hours_per_week=10,
         duration="2 months",
         fees_from=200,
     )
 
-    assert course_id == request.course_id
+    assert request.course_id == course_id
     assert request.course_name == "Bachelor of Community Services (HE20528)"
-    assert request.industry_standards == "Police Check"
-    assert request.competency == "top rated"
+    assert request.industry_standards == ["Police Check", "Security check"]
+    assert request.competency == ["top rated", "experienced"]
     assert request.location == "Sydney"
-    assert request.date == date
+    assert request.start_date == date
     assert request.availability is True
     assert request.hours_per_week == 10
     assert request.duration == "2 months"

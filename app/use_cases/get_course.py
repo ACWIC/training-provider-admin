@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from app.repositories.course_repo import CourseRepo
-from app.responses import ResponseFailure, ResponseSuccess
+from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
 class GetCourseByID(BaseModel):
@@ -15,8 +15,15 @@ class GetCourseByID(BaseModel):
 
     def execute(self, course_id: str):
         try:
-            course_id = self.course_repo.get_course(course_id=course_id)
-        except Exception as e:  # noqa - TODO: handle specific failure types
+            # Check if course with course_id exists
+            if not self.course_repo.course_exists(course_id):
+                return ResponseFailure.build_from_validation_error(
+                    message=f"Course_id={course_id} is invalid."
+                )
+            course = self.course_repo.get_course(course_id=course_id)
+            code = SuccessType.SUCCESS
+            message = "The course has been fetched."
+        except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 
-        return ResponseSuccess(value=course_id)
+        return ResponseSuccess(value=course, message=message, type=code)
