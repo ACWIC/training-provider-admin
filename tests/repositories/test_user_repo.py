@@ -41,7 +41,7 @@ def test_verify_password():
 @mock.patch("boto3.client")
 def test_create_user(boto_client):
     rep = S3UserRepo()
-    user = rep.create_user(test_data.sample_update_user_request.dict())
+    user = rep.create_user(test_data.sample_create_user_request.dict())
 
     assert user.username == test_data.sample_user.username
     assert user.email == test_data.sample_user.email

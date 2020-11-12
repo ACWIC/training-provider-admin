@@ -38,7 +38,7 @@ class UserDataProvider:
         )
 
         # CreateUserRequest Sample
-        self.sample_update_user_request = CreateUserRequest(
+        self.sample_create_user_request = CreateUserRequest(
             username=self.username,
             password=self.password,
             email=self.email,
