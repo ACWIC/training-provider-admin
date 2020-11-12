@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.courses import router as v1_course_router
-from app.api.enrolments import router as v1_router
 from app.api.user import router as v1_user_router
 
 API_GATEWAY_STAGE_PREFIX = os.environ.get("STAGE_PREFIX", default="")
@@ -25,6 +24,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(v1_router, prefix=API_GATEWAY_SERVICE_PREFIX)
 app.include_router(v1_user_router, prefix=API_GATEWAY_SERVICE_PREFIX)
 app.include_router(v1_course_router, prefix=API_GATEWAY_SERVICE_PREFIX)
