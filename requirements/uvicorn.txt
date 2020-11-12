@@ -2,7 +2,6 @@
 uvicorn==0.11.8
 
 # testing
-requests
 tox
 coverage
 pytest
@@ -10,6 +9,7 @@ pytest-cov
 pytest-sugar
 pytest-flake8
 pytest-asyncio
+requests
 
 # debugging
 ipython

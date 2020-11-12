@@ -38,14 +38,13 @@ class CourseDataProvider:  # (BaseModel):
             fees_from=200,
             created=self.created,
         )
-        self.sample_course_dict = vars(self.sample_course)
 
         # UpdateCourseRequest Sample
         self.sample_update_course_request = UpdateCourseRequest(
             course_id=course_id,
-            course_name="Bachelor of Community Services (HE20528)",
-            industry_standards=["Police Check", "Security check"],
-            competency=["top rated", "experienced"],
+            course_name="HE20528",
+            industry_standards=["Security check"],
+            competency=["experienced"],
             location="Sydney",
             start_date=date,
             availability=True,
@@ -53,7 +52,20 @@ class CourseDataProvider:  # (BaseModel):
             duration="2 months",
             fees_from=200,
         )
-        self.sample_update_course_request_dict = vars(self.sample_update_course_request)
+
+        self.sample_updated_course = Course(
+            course_id=course_id,
+            course_name="HE20528",
+            industry_standards=["Security check"],
+            competency=["experienced"],
+            location="Sydney",
+            start_date=date,
+            availability=True,
+            hours_per_week=10,
+            duration="2 months",
+            fees_from=200,
+            created=self.created,
+        )
 
         # NewCourseRequest Sample
         self.sample_create_course_request = NewCourseRequest(
@@ -67,4 +79,3 @@ class CourseDataProvider:  # (BaseModel):
             duration="2 months",
             fees_from=200,
         )
-        self.sample_create_course_request_dict = vars(self.sample_create_course_request)

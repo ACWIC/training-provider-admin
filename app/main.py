@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from app.api.courses import router as v1_course_router
 from app.api.enrolments import router as v1_router
 from app.api.user import router as v1_user_router
 
@@ -26,3 +27,4 @@ app.add_middleware(
 
 app.include_router(v1_router, prefix=API_GATEWAY_SERVICE_PREFIX)
 app.include_router(v1_user_router, prefix=API_GATEWAY_SERVICE_PREFIX)
+app.include_router(v1_course_router, prefix=API_GATEWAY_SERVICE_PREFIX)

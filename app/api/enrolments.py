@@ -1,47 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.repositories.s3_course_repo import S3CourseRepo
 from app.repositories.s3_enrolment_repo import S3EnrolmentRepo
-from app.requests.create_course_request import NewCourseRequest
 from app.requests.enrolment_requests import NewEnrolmentRequest
-from app.requests.update_course_request import UpdateCourseRequest
 from app.security import oauth2_scheme
-from app.use_cases.create_course import CreateNewCourse
-from app.use_cases.create_new_enrolment import CreateNewEnrolment
-from app.use_cases.get_course import GetCourseByID
-from app.use_cases.update_course import UpdateCourse
+from app.use_cases import create_new_enrolment as cne
 
 router = APIRouter()
-course_repo = S3CourseRepo()
 enrolment_repo = S3EnrolmentRepo()
-
-
-@router.post("/post_course")
-def post_course(inputs: NewCourseRequest, token: str = Depends(oauth2_scheme)):
-    """Create a new Course in Course Catalogue"""
-    use_case = CreateNewCourse(course_repo=course_repo)
-    response = use_case.execute(inputs)
-    return response
-
-
-@router.post("/update_course")
-def update_course(inputs: UpdateCourseRequest, token: str = Depends(oauth2_scheme)):
-    """Update an existing Course in Course Catalogue
-    course id is mandatory, other attributes are optional
-    """
-    use_case = UpdateCourse(course_repo=course_repo)
-    response = use_case.execute(inputs)
-    return response
-
-
-@router.get("/get_course/{course_id}")
-def get_course(course_id: str, token: str = Depends(oauth2_scheme)):
-    """Get an existing Course in Course Catalogue
-    using course id
-    """
-    use_case = GetCourseByID(course_repo=course_repo)
-    response = use_case.execute(course_id)
-    return response
 
 
 @router.get("/enrolments/{enrolment_id}")
@@ -60,7 +25,10 @@ def create_enrolment(inputs: NewEnrolmentRequest, token: str = Depends(oauth2_sc
 
     The initial state of the enrollment authorisation is “lodged”.
     """
-    use_case = CreateNewEnrolment(enrolment_repo=enrolment_repo)
+    use_case = cne.CreateNewEnrolment(enrolment_repo=enrolment_repo)
     response = use_case.execute(inputs)
 
-    return response
+    if bool(response) is False:  # If request failed
+        raise HTTPException(status_code=response.type.value, detail=response.message)
+
+    return response.build()
