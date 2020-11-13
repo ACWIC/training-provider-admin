@@ -56,7 +56,7 @@ def test_create_course_failure(use_case):
 
 @mock.patch("app.use_cases.update_course.UpdateCourse")
 def test_update_course_success(use_case):
-    message = "The callback has been fetched from the server."
+    message = "The course has been updated."
     use_case().execute.return_value = ResponseSuccess(
         value=test_data.sample_updated_course,
         message=message,
@@ -90,7 +90,7 @@ def test_update_course_failure(use_case):
 
 @mock.patch("app.use_cases.get_course.GetCourseByID")
 def test_get_course_by_id_success(use_case):
-    message = "The callback has been fetched from the server."
+    message = "The course has been fetched."
     use_case().execute.return_value = ResponseSuccess(
         value=test_data.sample_course,
         message=message,
