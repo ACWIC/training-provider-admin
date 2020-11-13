@@ -29,7 +29,6 @@ def test_save_course(boto_client, get_uuid):
     with mock_datetime_now(test_data.created, datetime):
         course = repo.create_course(request)
 
-    print(course, test_data.sample_course)
     assert course == test_data.sample_course
 
     boto_client.return_value.put_object.assert_called_once_with(
@@ -45,7 +44,7 @@ def test_update_course(boto_client, repo_get_course):
     course_id = test_data.sample_course_id
     repo = S3CourseRepo()
     settings.COURSE_BUCKET = "some-bucket"
-    sample_course = test_data.sample_course
+    sample_course = test_data.sample_updated_course
     params = test_data.sample_update_course_request
 
     repo_get_course.return_value = sample_course

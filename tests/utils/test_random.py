@@ -14,8 +14,6 @@ def test_random():
     hash1 = Random.get_str_hash(random_string1)
     hash2 = Random.get_str_hash(random_string2)
 
-    print(random_string1, random_string2, hash1, hash2)
-
     assert random_string1 != random_string2
     assert hash1 != random_string1
     assert hash2 != random_string2

@@ -4,7 +4,6 @@ from app.requests import ValidRequest
 
 
 class NewCourseRequest(ValidRequest):
-    # course_id: str
     course_name: str
     industry_standards: list
     competency: list
@@ -14,4 +13,3 @@ class NewCourseRequest(ValidRequest):
     hours_per_week: float
     duration: str
     fees_from: float
-    # created: datetime

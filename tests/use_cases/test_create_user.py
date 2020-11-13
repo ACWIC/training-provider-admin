@@ -16,7 +16,7 @@ def test_create_user_success():
     """
     repo = mock.Mock(spec=UserRepo)
     user = test_data.sample_user
-    request = test_data.sample_update_user_request
+    request = test_data.sample_create_user_request
     use_case = CreateNewUser(user_repo=repo)
 
     repo.create_user.return_value = user
@@ -34,7 +34,7 @@ def test_create_user_failure():
     """
     repo = mock.Mock(spec=UserRepo)
     repo.create_user.side_effect = Exception()
-    request = test_data.sample_update_user_request
+    request = test_data.sample_create_user_request
     use_case = CreateNewUser(user_repo=repo)
 
     response = use_case.execute(request)
