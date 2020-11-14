@@ -6,3 +6,4 @@ CALLBACK_BUCKET=put-callbacks-here
 ENROLMENT_BUCKET=put-enrolments-here
 COURSE_BUCKET=put-courses-here
 USER_BUCKET=put-users-here
+STANDARDS_BUCKET=put-standards-here
