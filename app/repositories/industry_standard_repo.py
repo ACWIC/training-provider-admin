@@ -1,13 +1,13 @@
 import abc
 
 from app.domain.entities.industry_standard import IndustryStandard
-from app.requests.industry_standard_request import NewIndustryStandard
+from app.requests.industry_standard_request import IndustryStandardRequest
 
 
 class IndustryStandardRepo(abc.ABC):
     @abc.abstractmethod
     def post_industry_standard(
-        self, industry_standard_request: NewIndustryStandard
+        self, industry_standard_request: IndustryStandardRequest
     ) -> IndustryStandard:
         pass
 

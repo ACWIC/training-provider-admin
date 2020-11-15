@@ -6,7 +6,7 @@ import boto3
 from app.config import settings
 from app.domain.entities.industry_standard import IndustryStandard
 from app.repositories.industry_standard_repo import IndustryStandardRepo
-from app.requests.industry_standard_request import NewIndustryStandard
+from app.requests.industry_standard_request import IndustryStandardRequest
 from app.utils import Random
 from app.utils.error_handling import handle_s3_errors
 
@@ -20,7 +20,7 @@ class S3IndustryStandardRepo(IndustryStandardRepo):
             self.s3 = boto3.client("s3", **settings.s3_configuration)
 
     def post_industry_standard(
-        self, industry_standard_request: NewIndustryStandard
+        self, industry_standard_request: IndustryStandardRequest
     ) -> IndustryStandard:
         input_standard = industry_standard_request.dict()
         input_standard["standard_id"] = Random.get_uuid()

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.repositories.s3_industry_standard_repo import S3IndustryStandardRepo
-from app.requests.industry_standard_request import NewIndustryStandard
+from app.requests.industry_standard_request import IndustryStandardRequest
 from app.use_cases.delete_industry_standard import DeleteIndustryStandard
 from app.use_cases.get_industry_standards import GetIndustryStandards
 from app.use_cases.post_industry_standard import PostIndustryStandard
@@ -11,7 +11,7 @@ industry_standard_repo = S3IndustryStandardRepo()
 
 
 @router.post("/industry_standard")
-def post_industry_standard(inputs: NewIndustryStandard):
+def post_industry_standard(inputs: IndustryStandardRequest):
     """Create a new industry_standard in industry_standard repository"""
     use_case = PostIndustryStandard(industry_standard_repo=industry_standard_repo)
     response = use_case.execute(inputs)

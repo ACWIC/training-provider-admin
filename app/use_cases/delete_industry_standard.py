@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from app.repositories.industry_standard_repo import IndustryStandardRepo
-from app.responses import ResponseFailure, ResponseSuccess
+from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
 class DeleteIndustryStandard(BaseModel):
@@ -23,8 +23,9 @@ class DeleteIndustryStandard(BaseModel):
             industry_standard = self.industry_standard_repo.delete_industry_standard(
                 standard_id
             )
+            code = SuccessType.SUCCESS
             message = "The industry_standard has been deleted."
         except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 
-        return ResponseSuccess(value=industry_standard, message=message)
+        return ResponseSuccess(value=industry_standard, message=message, type=code)
