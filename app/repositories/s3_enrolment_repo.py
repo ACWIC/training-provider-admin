@@ -56,10 +56,7 @@ def filters_match(enrolment: dict, enrolment_filters: dict):
 
 def if_dates_in_range(enrolment: dict, enrolment_filters: dict):
     date_in_range = True
-    if (
-        enrolment_filters["start_date"] is not None
-        and enrolment_filters["end_date"] is not None
-    ):
+    if enrolment_filters.get("start_date") and enrolment_filters.get("end_date"):
         date_in_range = False
         if (
             enrolment_filters["start_date"].replace(tzinfo=None)
@@ -67,9 +64,9 @@ def if_dates_in_range(enrolment: dict, enrolment_filters: dict):
             <= enrolment_filters["end_date"].replace(tzinfo=None)
         ):
             date_in_range = True
-    elif enrolment_filters["receive_date"] is not None:
-        date_in_range = False
-        if enrolment["created"].date == enrolment_filters["receive_date"].date:
-            date_in_range = True
+    elif enrolment_filters.get("receive_date"):
+        date_in_range = (
+            enrolment["created"].date() == enrolment_filters["receive_date"].date()
+        )
 
     return date_in_range

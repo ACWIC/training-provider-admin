@@ -3,7 +3,11 @@ from unittest import mock
 from botocore.stub import Stubber
 
 from app.config import settings
-from app.repositories.s3_enrolment_repo import S3EnrolmentRepo
+from app.repositories.s3_enrolment_repo import (
+    S3EnrolmentRepo,
+    filters_match,
+    if_dates_in_range,
+)
 from tests.test_data.boto_client_responses import (
     get_object_response,
     list_objects_response,
@@ -46,3 +50,70 @@ def test_get_enrolments(json_loads):
         results = repo.get_enrolments(filters)
 
     assert results == sample_result
+
+
+@mock.patch("json.loads")
+def test_get_enrolments_filter_by_date(json_loads):
+    filters = test_data.sample_enrolment_filters_2
+    repo = S3EnrolmentRepo()
+    stubber = Stubber(repo.s3)
+    settings.ENROLMENT_BUCKET = "some-bucket"
+    sample_result = test_data.sample_result_2["enrolments"]
+    json_loads.side_effect = [
+        sample_result[0].dict(),
+        sample_result[1].dict(),
+    ]
+
+    stubber.add_response(
+        "list_objects",
+        list_objects_response([test_data.enrolment_id1, test_data.enrolment_id2]),
+        {"Bucket": "some-bucket"},
+    )
+    stubber.add_response(
+        "get_object",
+        get_object_response(test_data.sample_enrolment),
+        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id1}.json"},
+    )
+
+    stubber.add_response(
+        "get_object",
+        get_object_response(test_data.sample_enrolment1),
+        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id2}.json"},
+    )
+
+    with stubber:
+        results = repo.get_enrolments(filters)
+
+    # Only the second enrolment matches the filter, so result should have one item
+    assert len(results) == 1
+    assert results[0] == sample_result[1]
+
+
+def test_filters_match():
+    enrolment = test_data.sample_enrolment.dict()
+    enrolment_filters = test_data.sample_enrolment_filters.dict()
+    enrolment_filters1 = test_data.sample_enrolment_filters_2.dict()
+
+    assert filters_match(enrolment, enrolment_filters)
+    assert not filters_match(enrolment, enrolment_filters1)
+
+
+def test_if_dates_in_range():
+    enrolment = test_data.enrolment_created_in_range
+    enrolment_filters = test_data.enrolment_filters_start_date_in_range
+    assert if_dates_in_range(enrolment, enrolment_filters)
+
+    enrolment = test_data.enrolment_created_in_range
+    enrolment_filters = test_data.enrolment_filters_received_date
+    assert if_dates_in_range(enrolment, enrolment_filters)
+
+    enrolment_filters = test_data.enrolment_filters_start_date_none
+    assert if_dates_in_range(enrolment, enrolment_filters)
+
+    # If there is nothing to filter, than this should return True
+    enrolment_filters = {}
+    assert if_dates_in_range(enrolment, enrolment_filters)
+
+    enrolment = test_data.enrolment_created_not_in_range
+    enrolment_filters = test_data.enrolment_filters_start_date_in_range
+    assert not if_dates_in_range(enrolment, enrolment_filters)

@@ -12,12 +12,13 @@ class EnrolmentDataProvider:
     sample_uuid = "1dad3dd8-af28-4e61-ae23-4c93a456d10e"
     enrolment_id = "2dad3dd8-af28-4e61-ae23-4c93a456d10e"
     enrolment_id1 = "3dad3dd8-af28-4e61-ae23-4c93a456d10f"
+    enrolment_id2 = "4dad3dd8-af28-4e61-ae23-4c93a456d10f"
     shared_secret = "6dad3dd8-af28-4e61-ae23-4c93a456d10e"
     course_id = "7dad3dd8-af28-4e61-ae23-4c93a456d10e"
     employee_id = "8dad3dd8-af28-4e61-ae23-4c93a456d10e"
     date_time_str = "2018-05-29 08:15:27.243860"
     date_time_str1 = "2018-06-29 08:15:27.243860"
-    date_time_str2 = "2018-06-29 08:15:27.243860"
+    date_time_str2 = "2018-07-29 08:15:27.243860"
     start_date = datetime.datetime.strptime(date_time_str, "%Y-%m-%d %H:%M:%S.%f")
     end_date = datetime.datetime.strptime(date_time_str2, "%Y-%m-%d %H:%M:%S.%f")
     received1 = datetime.datetime.strptime(date_time_str1, "%Y-%m-%d %H:%M:%S.%f")
@@ -45,6 +46,13 @@ class EnrolmentDataProvider:
             created=self.created,
         )
 
+        self.sample_enrolment2 = Enrolment(
+            enrolment_id=self.enrolment_id2,
+            shared_secret=self.shared_secret,
+            internal_reference=self.ref_hash,
+            created=self.start_date,
+        )
+
         self.sample_enrolment_filters = EnrolmentFilters(
             course_id=self.course_id,
             start_date=self.start_date,
@@ -61,9 +69,48 @@ class EnrolmentDataProvider:
 
         self.sample_enrolment_filters_2 = EnrolmentFilters(
             course_id=self.course_id,
-            receive_date=self.created,
+            start_date=self.start_date,
+            end_date=self.start_date,
         )
 
         self.sample_result = {
             "enrolments": [self.sample_enrolment, self.sample_enrolment1]
+        }
+
+        self.sample_result_2 = {
+            "enrolments": [self.sample_enrolment1, self.sample_enrolment2]
+        }
+
+        # start date
+        self.enrolment_created_in_range = {
+            "created": datetime.datetime.strptime(
+                "2018-06-05 08:15:27.243860", "%Y-%m-%d %H:%M:%S.%f"
+            ),
+        }
+        self.enrolment_created_not_in_range = {
+            "created": datetime.datetime.strptime(
+                "2018-06-15 08:15:27.243860", "%Y-%m-%d %H:%M:%S.%f"
+            ),
+        }
+        self.enrolment_filters_start_date_in_range = {
+            "start_date": datetime.datetime.strptime(
+                "2018-06-01 08:15:27.243860", "%Y-%m-%d %H:%M:%S.%f"
+            ),
+            "end_date": datetime.datetime.strptime(
+                "2018-06-10 08:15:27.243860", "%Y-%m-%d %H:%M:%S.%f"
+            ),
+            "receive_data": None,
+        }
+        self.enrolment_filters_start_date_none = {
+            "start_date": None,
+            "end_date": None,
+            "receive_date": None,
+        }
+
+        self.enrolment_filters_received_date = {
+            "start_date": None,
+            "end_date": None,
+            "receive_date": datetime.datetime.strptime(
+                "2018-06-05 15:15:27.243860", "%Y-%m-%d %H:%M:%S.%f"
+            ),
         }
