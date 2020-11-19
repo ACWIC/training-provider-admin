@@ -16,7 +16,7 @@ def get_enrolment(
     start_date: Optional[str],
     end_date: Optional[str],
     receive_date: Optional[str],
-    token: Depends(oauth2_scheme),
+    token: str = Depends(oauth2_scheme),
 ):
     """Get enrolments by filtering"""
     inputs = {
