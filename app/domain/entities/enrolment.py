@@ -12,7 +12,7 @@ class Enrolment(BaseModel):
 
 
 class EnrolmentFilters(BaseModel):
-    course_id: Optional[str]
-    start_date: Optional[str]
-    end_date: Optional[str]
-    receive_date: Optional[str]
+    course_id: str
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    receive_date: Optional[datetime]
