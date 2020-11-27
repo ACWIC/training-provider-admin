@@ -47,7 +47,6 @@ class S3IndustryStandardRepo(IndustryStandardRepo):
                 Bucket=settings.STANDARDS_BUCKET,
                 Prefix="{}/".format("industry_standards"),
             )
-        print("Contents", standards_objects_list.get("Contents", []))
         standards_list = []
         for standards_object in standards_objects_list.get("Contents", []):
             with handle_s3_errors():

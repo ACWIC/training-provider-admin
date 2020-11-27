@@ -10,7 +10,7 @@ router = APIRouter()
 industry_standard_repo = S3IndustryStandardRepo()
 
 
-@router.post("/industry_standard")
+@router.post("/industry_standards")
 def post_industry_standard(inputs: IndustryStandardRequest):
     """Create a new industry_standard in industry_standard repository"""
     use_case = PostIndustryStandard(industry_standard_repo=industry_standard_repo)
@@ -18,7 +18,7 @@ def post_industry_standard(inputs: IndustryStandardRequest):
     return response
 
 
-@router.delete("/industry_standard/{standard_id}")
+@router.delete("/industry_standards/{standard_id}")
 def delete_industry_standard(standard_id: str):
     """Delete an existing industry_standard in industry_standard respository"""
     use_case = DeleteIndustryStandard(industry_standard_repo=industry_standard_repo)
