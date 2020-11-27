@@ -16,7 +16,7 @@ course_repo = S3CourseRepo()
 def post_course(inputs: NewCourseRequest, token: str = Depends(oauth2_scheme)):
     """
     Create a new Course in Course Catalogue\n
-    <b>course_name</b> is required.
+    <b>course_name</b> is required.\n
     <b>industry_standards</b> is a list of industry standard versions
     this course confirms to.\n
     <b>competency</b> is a list of competencies.\n
@@ -46,7 +46,7 @@ def post_course(inputs: NewCourseRequest, token: str = Depends(oauth2_scheme)):
 def update_course(inputs: UpdateCourseRequest, token: str = Depends(oauth2_scheme)):
     """Update an existing Course in Course Catalogue\n
     <b>course_id</b> is mandatory which identifies the course.\n
-    <b>course_name</b> is optional.
+    <b>course_name</b> is optional.\n
     <b>industry_standards</b> is a list of industry standard versions
     this course confirms to. It is optional\n
     <b>competency</b> is a list of competencies. It is optional\n
