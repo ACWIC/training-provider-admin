@@ -5,7 +5,7 @@ from app.requests.create_course_request import NewCourseRequest
 from app.requests.update_course_request import UpdateCourseRequest
 
 
-class CourseDataProvider:  # (BaseModel):
+class CourseDataProvider:
     sample_course: Course
     sample_course_dict: dict
     sample_update_course_request: UpdateCourseRequest
