@@ -4,7 +4,11 @@ from typing import Any, List
 import boto3
 
 from app.config import settings
-from app.domain.entities.enrolment import Enrolment, EnrolmentFilters
+from app.domain.entities.enrolment_request import (
+    VALID_STATE_CHANGES,
+    EnrolmentFilters,
+    EnrolmentRequest,
+)
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.utils.error_handling import handle_s3_errors
 
@@ -16,7 +20,9 @@ class S3EnrolmentRepo(EnrolmentRepo):
         super().__init__(**kwargs)
         self.s3 = boto3.client("s3", **settings.s3_configuration)
 
-    def get_enrolments(self, enrolment_filters: EnrolmentFilters) -> List[Enrolment]:
+    def get_enrolments(
+        self, enrolment_filters: EnrolmentFilters
+    ) -> List[EnrolmentRequest]:
         enrolment_filters = enrolment_filters.dict()
         with handle_s3_errors():
             enrolment_objects_list = self.s3.list_objects(
@@ -30,11 +36,34 @@ class S3EnrolmentRepo(EnrolmentRepo):
                     Bucket=settings.ENROLMENT_BUCKET,
                 )
             enrolment = json.loads(obj["Body"].read().decode())
-            enrolment = Enrolment(**enrolment).dict()
+            enrolment = EnrolmentRequest(**enrolment).dict()
             if filters_match(enrolment, enrolment_filters.copy()):
                 enrolments_list.append(enrolment)
 
         return enrolments_list
+
+    def get_enrolment_by_id(self, enrolment_request_id: str) -> EnrolmentRequest:
+        with handle_s3_errors():
+            obj = self.s3.get_object(
+                Key=f"enrolments/{enrolment_request_id}.json",
+                Bucket=settings.ENROLMENT_BUCKET,
+            )
+        enrolment = EnrolmentRequest(**json.loads(obj["Body"].read().decode()))
+        return enrolment
+
+    def update_enrolment_state(
+        self, enrolment: EnrolmentRequest, new_state: str
+    ) -> EnrolmentRequest:
+        new_enrolment = enrolment.dict()
+        new_enrolment.update({"state": new_state})
+        new_enrolment = EnrolmentRequest(**new_enrolment)
+        with handle_s3_errors():
+            self.s3.put_object(
+                Body=bytes(new_enrolment.json(), "utf-8"),
+                Key=f"enrolments/{new_enrolment.enrolment_id}.json",
+                Bucket=settings.ENROLMENT_BUCKET,
+            )
+        return new_enrolment
 
 
 def filters_match(enrolment: dict, enrolment_filters: dict):
@@ -70,3 +99,9 @@ def if_dates_in_range(enrolment: dict, enrolment_filters: dict):
         )
 
     return date_in_range
+
+
+def state_change_valid(current_state, new_state) -> bool:
+    if (current_state, new_state) in VALID_STATE_CHANGES:
+        return True
+    return False

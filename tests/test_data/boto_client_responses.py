@@ -89,3 +89,17 @@ def list_objects_empty_response():
         "EncodingType": "url",
     }
     return response
+
+
+def put_object_response():
+    return {
+        "Expiration": "string",
+        "ETag": "string",
+        "ServerSideEncryption": "AES256",
+        "VersionId": "string",
+        "SSECustomerAlgorithm": "string",
+        "SSECustomerKeyMD5": "string",
+        "SSEKMSKeyId": "string",
+        "SSEKMSEncryptionContext": "string",
+        "RequestCharged": "requester",
+    }

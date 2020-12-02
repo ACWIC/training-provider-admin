@@ -15,7 +15,7 @@ indent_size = 2
 
 # Docstrings and comments use max_line_length = 79
 [*.py]
-max_line_length = 79
+max_line_length = 100
 
 # Makefiles always use tabs for indentation
 [Makefile]

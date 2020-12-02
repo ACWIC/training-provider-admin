@@ -1,11 +1,16 @@
 import datetime
 
-from app.domain.entities.enrolment import Enrolment, EnrolmentFilters
+from app.domain.entities.enrolment_request import (
+    EnrolmentFilters,
+    EnrolmentRequest,
+    State,
+)
+from app.requests.enrolment_requests import ProcessEnrolmentRequest
 from app.utils.random import Random
 
 
 class EnrolmentDataProvider:
-    sample_enrolment: Enrolment
+    sample_enrolment: EnrolmentRequest
 
     internal_reference = "ref1"
     ref_hash = Random.get_str_hash(internal_reference)
@@ -23,34 +28,43 @@ class EnrolmentDataProvider:
     end_date = datetime.datetime.strptime(date_time_str2, "%Y-%m-%d %H:%M:%S.%f")
     received1 = datetime.datetime.strptime(date_time_str1, "%Y-%m-%d %H:%M:%S.%f")
     created = received1
+    state = State.NEW
 
     def __init__(self):
-        self.sample_enrolment = Enrolment(
+        self.sample_enrolment = EnrolmentRequest(
             enrolment_id=self.enrolment_id,
             shared_secret=self.shared_secret,
             internal_reference=self.ref_hash,
             created=self.created,
+            state=self.state,
         )
 
-        self.sample_create_enrolment = Enrolment(
+        self.updated_enrolment = self.sample_enrolment.dict()
+        self.updated_enrolment["state"] = State.ACCEPTED
+        self.updated_enrolment = EnrolmentRequest(**self.updated_enrolment)
+
+        self.sample_create_enrolment = EnrolmentRequest(
             enrolment_id=self.sample_uuid,
             shared_secret=self.sample_uuid,
             internal_reference=self.ref_hash,
             created=self.created,
+            state=self.state,
         )
 
-        self.sample_enrolment1 = Enrolment(
+        self.sample_enrolment1 = EnrolmentRequest(
             enrolment_id=self.enrolment_id1,
             shared_secret=self.shared_secret,
             internal_reference=self.ref_hash,
             created=self.created,
+            state=self.state,
         )
 
-        self.sample_enrolment2 = Enrolment(
+        self.sample_enrolment2 = EnrolmentRequest(
             enrolment_id=self.enrolment_id2,
             shared_secret=self.shared_secret,
             internal_reference=self.ref_hash,
             created=self.start_date,
+            state=self.state,
         )
 
         self.sample_enrolment_filters = EnrolmentFilters(
@@ -80,6 +94,13 @@ class EnrolmentDataProvider:
         self.sample_result_2 = {
             "enrolments": [self.sample_enrolment1, self.sample_enrolment2]
         }
+
+        self.process_enrolment_request = ProcessEnrolmentRequest(
+            enrolment_request_id=self.enrolment_id, new_state=State.ACCEPTED
+        )
+        self.process_enrolment_failing_request = ProcessEnrolmentRequest(
+            enrolment_request_id=self.enrolment_id, new_state=State.CANCELLED
+        )
 
         # start date
         self.enrolment_created_in_range = {
