@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-from app.domain.entities.enrolment_request import EnrolmentFilters
+from app.domain.entities.enrolment_request import EnrolmentAuthFilters
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
-class GetEnrolments(BaseModel):
+class GetEnrolmentAuths(BaseModel):
     enrolment_repo: EnrolmentRepo
 
     class Config:
@@ -16,11 +16,11 @@ class GetEnrolments(BaseModel):
 
     def execute(self, enrolment_filters: dict):
         try:
-            enrolment_filters = EnrolmentFilters(**enrolment_filters)
+            enrolment_filters = EnrolmentAuthFilters(**enrolment_filters)
             enrolments = self.enrolment_repo.get_enrolments(enrolment_filters)
             result = {"enrolments": enrolments}
             code = SuccessType.SUCCESS
-            message = "The enrolments have been fetched."
+            message = "The enrolment requests have been fetched."
         except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 

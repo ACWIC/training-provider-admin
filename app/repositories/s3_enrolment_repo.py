@@ -6,8 +6,8 @@ import boto3
 from app.config import settings
 from app.domain.entities.enrolment_request import (
     VALID_STATE_CHANGES,
-    EnrolmentFilters,
-    EnrolmentRequest,
+    EnrolmentAuth,
+    EnrolmentAuthFilters,
 )
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.utils.error_handling import handle_s3_errors
@@ -18,50 +18,61 @@ class S3EnrolmentRepo(EnrolmentRepo):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.s3 = boto3.client("s3", **settings.s3_configuration)
+        with handle_s3_errors():
+            self.s3 = boto3.client("s3", **settings.s3_configuration)
 
     def get_enrolments(
-        self, enrolment_filters: EnrolmentFilters
-    ) -> List[EnrolmentRequest]:
+        self, enrolment_filters: EnrolmentAuthFilters
+    ) -> List[EnrolmentAuth]:
         enrolment_filters = enrolment_filters.dict()
         with handle_s3_errors():
             enrolment_objects_list = self.s3.list_objects(
-                Bucket=settings.ENROLMENT_BUCKET
+                Bucket=settings.ENROLMENT_AUTHORISATION_BUCKET
             )
         enrolments_list = []
         for enrolments_object in enrolment_objects_list.get("Contents", []):
             with handle_s3_errors():
                 obj = self.s3.get_object(
-                    Key=f"enrolments/{enrolments_object['Key']}.json",
-                    Bucket=settings.ENROLMENT_BUCKET,
+                    Key=f"enrolment_authorisations/{enrolments_object['Key']}.json",
+                    Bucket=settings.ENROLMENT_AUTHORISATION_BUCKET,
                 )
             enrolment = json.loads(obj["Body"].read().decode())
-            enrolment = EnrolmentRequest(**enrolment).dict()
+            enrolment = EnrolmentAuth(**enrolment).dict()
             if filters_match(enrolment, enrolment_filters.copy()):
                 enrolments_list.append(enrolment)
 
         return enrolments_list
 
-    def get_enrolment_by_id(self, enrolment_request_id: str) -> EnrolmentRequest:
+    def get_enrolment_auth_by_id(self, enrolment_request_id: str) -> EnrolmentAuth:
         with handle_s3_errors():
             obj = self.s3.get_object(
-                Key=f"enrolments/{enrolment_request_id}.json",
-                Bucket=settings.ENROLMENT_BUCKET,
+                Key=f"enrolment_authorisations/{enrolment_request_id}.json",
+                Bucket=settings.ENROLMENT_AUTHORISATION_BUCKET,
             )
-        enrolment = EnrolmentRequest(**json.loads(obj["Body"].read().decode()))
+        enrolment = EnrolmentAuth(**json.loads(obj["Body"].read().decode()))
         return enrolment
 
+    def enrolment_auth_exists(self, enrolment_request_id: str) -> bool:
+        try:
+            self.s3.get_object(
+                Key=f"enrolment_authorisations/{enrolment_request_id}.json",
+                Bucket=settings.ENROLMENT_AUTHORISATION_BUCKET,
+            )
+            return True
+        except Exception:
+            return False
+
     def update_enrolment_state(
-        self, enrolment: EnrolmentRequest, new_state: str
-    ) -> EnrolmentRequest:
+        self, enrolment: EnrolmentAuth, new_state: str
+    ) -> EnrolmentAuth:
         new_enrolment = enrolment.dict()
         new_enrolment.update({"state": new_state})
-        new_enrolment = EnrolmentRequest(**new_enrolment)
+        new_enrolment = EnrolmentAuth(**new_enrolment)
         with handle_s3_errors():
             self.s3.put_object(
                 Body=bytes(new_enrolment.json(), "utf-8"),
-                Key=f"enrolments/{new_enrolment.enrolment_id}.json",
-                Bucket=settings.ENROLMENT_BUCKET,
+                Key=f"enrolment_authorisations/{new_enrolment.enrolment_id}.json",
+                Bucket=settings.ENROLMENT_AUTHORISATION_BUCKET,
             )
         return new_enrolment
 

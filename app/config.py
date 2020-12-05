@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY_ID: Optional[str]
     S3_SECRET_ACCESS_KEY: Optional[str]
     S3_ENDPOINT_URL: Optional[str]
-    ENROLMENT_BUCKET: str
+    ENROLMENT_AUTHORISATION_BUCKET: str
     CALLBACK_BUCKET: str
     ENROLMENT_AUTHORISATION_BUCKET: str
     COURSE_BUCKET: str

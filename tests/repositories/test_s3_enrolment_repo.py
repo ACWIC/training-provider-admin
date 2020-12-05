@@ -3,7 +3,7 @@ from unittest import mock
 from botocore.stub import Stubber
 
 from app.config import settings
-from app.domain.entities.enrolment_request import EnrolmentRequest, State
+from app.domain.entities.enrolment_request import EnrolmentAuth, State
 from app.repositories.s3_enrolment_repo import (
     S3EnrolmentRepo,
     filters_match,
@@ -22,10 +22,10 @@ test_data = EnrolmentDataProvider()
 
 @mock.patch("json.loads")
 def test_get_enrolments(json_loads):
-    filters = test_data.sample_enrolment_filters
+    filters = test_data.sample_enrolment_auth_filters
     repo = S3EnrolmentRepo()
     stubber = Stubber(repo.s3)
-    settings.ENROLMENT_BUCKET = "some-bucket"
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
     sample_result = test_data.sample_result["enrolments"]
     json_loads.side_effect = [
         sample_result[0].dict(),
@@ -39,14 +39,20 @@ def test_get_enrolments(json_loads):
     )
     stubber.add_response(
         "get_object",
-        get_object_response(test_data.sample_enrolment),
-        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id}.json"},
+        get_object_response(test_data.sample_enrolment_auth),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id}.json",
+        },
     )
 
     stubber.add_response(
         "get_object",
-        get_object_response(test_data.sample_enrolment1),
-        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id1}.json"},
+        get_object_response(test_data.sample_enrolment_auth1),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id1}.json",
+        },
     )
 
     with stubber:
@@ -57,10 +63,10 @@ def test_get_enrolments(json_loads):
 
 @mock.patch("json.loads")
 def test_get_enrolments_filter_by_date(json_loads):
-    filters = test_data.sample_enrolment_filters_2
+    filters = test_data.sample_enrolment_auth_filters_2
     repo = S3EnrolmentRepo()
     stubber = Stubber(repo.s3)
-    settings.ENROLMENT_BUCKET = "some-bucket"
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
     sample_result = test_data.sample_result_2["enrolments"]
     json_loads.side_effect = [
         sample_result[0].dict(),
@@ -74,14 +80,20 @@ def test_get_enrolments_filter_by_date(json_loads):
     )
     stubber.add_response(
         "get_object",
-        get_object_response(test_data.sample_enrolment),
-        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id1}.json"},
+        get_object_response(test_data.sample_enrolment_auth),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id1}.json",
+        },
     )
 
     stubber.add_response(
         "get_object",
-        get_object_response(test_data.sample_enrolment1),
-        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id2}.json"},
+        get_object_response(test_data.sample_enrolment_auth1),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id2}.json",
+        },
     )
 
     with stubber:
@@ -93,27 +105,30 @@ def test_get_enrolments_filter_by_date(json_loads):
 
 
 @mock.patch("json.loads")
-def test_get_enrolment_by_id(json_loads):
+def test_get_enrolment_auth_by_id(json_loads):
     repo = S3EnrolmentRepo()
     stubber = Stubber(repo.s3)
-    settings.ENROLMENT_BUCKET = "some-bucket"
-    json_loads.side_effect = [test_data.sample_enrolment.dict()]
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
+    json_loads.side_effect = [test_data.sample_enrolment_auth.dict()]
     stubber.add_response(
         "get_object",
-        get_object_response(test_data.sample_enrolment),
-        {"Bucket": "some-bucket", "Key": f"enrolments/{test_data.enrolment_id1}.json"},
+        get_object_response(test_data.sample_enrolment_auth),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id1}.json",
+        },
     )
     with stubber:
-        result = repo.get_enrolment_by_id(test_data.enrolment_id1)
+        result = repo.get_enrolment_auth_by_id(test_data.enrolment_id1)
 
-    assert isinstance(result, EnrolmentRequest)
-    assert result == test_data.sample_enrolment
+    assert isinstance(result, EnrolmentAuth)
+    assert result == test_data.sample_enrolment_auth
 
 
 def test_update_enrolment_state():
     repo = S3EnrolmentRepo()
     stubber = Stubber(repo.s3)
-    settings.ENROLMENT_BUCKET = "some-bucket"
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
 
     stubber.add_response(
         "put_object",
@@ -121,20 +136,22 @@ def test_update_enrolment_state():
         {
             "Body": bytes(test_data.updated_enrolment.json(), "utf-8"),
             "Bucket": "some-bucket",
-            "Key": f"enrolments/{test_data.updated_enrolment.enrolment_id}.json",
+            "Key": f"enrolment_authorisations/{test_data.updated_enrolment.enrolment_id}.json",
         },
     )
     with stubber:
-        result = repo.update_enrolment_state(test_data.sample_enrolment, State.ACCEPTED)
+        result = repo.update_enrolment_state(
+            test_data.sample_enrolment_auth, State.ACCEPTED
+        )
 
-    assert isinstance(result, EnrolmentRequest)
+    assert isinstance(result, EnrolmentAuth)
     assert result.state == State.ACCEPTED
 
 
 def test_filters_match():
-    enrolment = test_data.sample_enrolment.dict()
-    enrolment_filters = test_data.sample_enrolment_filters.dict()
-    enrolment_filters1 = test_data.sample_enrolment_filters_2.dict()
+    enrolment = test_data.sample_enrolment_auth.dict()
+    enrolment_filters = test_data.sample_enrolment_auth_filters.dict()
+    enrolment_filters1 = test_data.sample_enrolment_auth_filters_2.dict()
 
     assert filters_match(enrolment, enrolment_filters)
     assert not filters_match(enrolment, enrolment_filters1)

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.domain.entities.enrolment_request import State
 from app.repositories.s3_course_repo import S3CourseRepo
 from app.repositories.s3_enrolment_repo import S3EnrolmentRepo
-from app.requests.enrolment_requests import ProcessEnrolmentRequest
+from app.requests.enrolment_requests import EnrolmentAuthRequest
 from app.security import oauth2_scheme
 from app.use_cases import get_enrolments as ge
 from app.use_cases import process_enrolments as pe
@@ -30,7 +30,7 @@ def get_enrolment_requests(
         "end_date": end_date,
         "receive_date": receive_date,
     }
-    use_case = ge.GetEnrolments(enrolment_repo=enrolment_repo)
+    use_case = ge.GetEnrolmentAuths(enrolment_repo=enrolment_repo)
     response = use_case.execute(inputs)
     if bool(response) is False:  # If request failed
         raise HTTPException(status_code=response.type.value, detail=response.message)
@@ -45,11 +45,11 @@ def process_enrolment(
 ):
     """Change state of enrolment with the given new state value"""
 
-    request = ProcessEnrolmentRequest(
+    request = EnrolmentAuthRequest(
         enrolment_request_id=enrolment_request_id,
         new_state=new_state,
     )
-    use_case = pe.ProcessEnrolments(enrolment_repo=enrolment_repo)
+    use_case = pe.ProcessEnrolmentAuths(enrolment_repo=enrolment_repo)
     response = use_case.execute(request)
     if bool(response) is False:  # If request failed
         raise HTTPException(status_code=response.type.value, detail=response.message)

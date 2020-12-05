@@ -28,15 +28,22 @@ VALID_STATE_CHANGES = (
 )
 
 
-class EnrolmentRequest(BaseModel):
+class EnrolmentStatus(str, Enum):
+    lodged = "Lodged"
+
+
+class EnrolmentAuth(BaseModel):
+    enrolment_auth_id: str
+    student_id: str
+    course_id: str
+    status: EnrolmentStatus = EnrolmentStatus.lodged
     enrolment_id: str
     shared_secret: str
-    internal_reference: str
     created: datetime = Field(default_factory=datetime.now)
     state: State
 
 
-class EnrolmentFilters(BaseModel):
+class EnrolmentAuthFilters(BaseModel):
     course_id: str
     start_date: Optional[datetime]
     end_date: Optional[datetime]

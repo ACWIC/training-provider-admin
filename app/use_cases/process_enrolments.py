@@ -2,11 +2,11 @@ from pydantic import BaseModel
 
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.repositories.s3_enrolment_repo import state_change_valid
-from app.requests.enrolment_requests import ProcessEnrolmentRequest
+from app.requests.enrolment_requests import EnrolmentAuthRequest
 from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
-class ProcessEnrolments(BaseModel):
+class ProcessEnrolmentAuths(BaseModel):
     enrolment_repo: EnrolmentRepo
 
     class Config:
@@ -15,15 +15,15 @@ class ProcessEnrolments(BaseModel):
         # that it will just check that the value isinstance of this class.
         arbitrary_types_allowed = True
 
-    def execute(self, process_enrolment_request: ProcessEnrolmentRequest):
+    def execute(self, process_enrolment_request: EnrolmentAuthRequest):
         try:
             new_state = process_enrolment_request.new_state
-            enrolment_id = process_enrolment_request.enrolment_request_id
-            enrolment = self.enrolment_repo.get_enrolment_by_id(enrolment_id)
-            if not enrolment:
+            enrolment_auth_id = process_enrolment_request.enrolment_request_id
+            if not self.enrolment_repo.enrolment_auth_exists(enrolment_auth_id):
                 return ResponseFailure.build_from_validation_error(
-                    message=f"Enrolment_id={enrolment_id} is invalid."
+                    message=f"Enrolment_id={enrolment_auth_id} is invalid."
                 )
+            enrolment = self.enrolment_repo.get_enrolment_auth_by_id(enrolment_auth_id)
             current_state = enrolment.state
             if not state_change_valid(current_state, new_state=new_state):
                 return ResponseFailure.build_from_validation_error(
