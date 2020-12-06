@@ -19,7 +19,6 @@ def post_course(inputs: NewCourseRequest, token: str = Depends(oauth2_scheme)):
     response = use_case.execute(inputs)
     if bool(response) is False:  # If request failed
         raise HTTPException(status_code=response.type.value, detail=response.message)
-
     return response.build()
 
 
