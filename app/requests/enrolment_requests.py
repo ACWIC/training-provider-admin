@@ -1,6 +1,6 @@
 from app.requests import ValidRequest
 
 
-class EnrolmentAuthRequest(ValidRequest):
+class ProcessEnrolmentRequest(ValidRequest):
     enrolment_request_id: str
     new_state: str

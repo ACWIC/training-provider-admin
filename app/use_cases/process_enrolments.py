@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from app.repositories.enrolment_repo import EnrolmentRepo
 from app.repositories.s3_enrolment_repo import state_change_valid
-from app.requests.enrolment_requests import EnrolmentAuthRequest
+from app.requests.enrolment_requests import ProcessEnrolmentRequest
 from app.responses import ResponseFailure, ResponseSuccess, SuccessType
 
 
@@ -15,7 +15,7 @@ class ProcessEnrolmentAuths(BaseModel):
         # that it will just check that the value isinstance of this class.
         arbitrary_types_allowed = True
 
-    def execute(self, process_enrolment_request: EnrolmentAuthRequest):
+    def execute(self, process_enrolment_request: ProcessEnrolmentRequest):
         try:
             new_state = process_enrolment_request.new_state
             enrolment_auth_id = process_enrolment_request.enrolment_request_id

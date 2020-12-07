@@ -20,7 +20,7 @@ app.dependency_overrides[oauth2_scheme] = override_dependency
 
 
 @mock.patch("app.use_cases.get_enrolments.GetEnrolmentAuths")
-def test_get_enrolments_success(use_case):
+def test_get_enrolment_auths_success(use_case):
     message = "The enrolment requests have been fetched."
     use_case().execute.return_value = ResponseSuccess(
         value=test_data.sample_result,
@@ -42,7 +42,7 @@ def test_get_enrolments_success(use_case):
 
 
 @mock.patch("app.use_cases.get_enrolments.GetEnrolmentAuths")
-def test_get_enrolments_failure(use_case):
+def test_get_enrolment_auths_failure(use_case):
     message = "Error"
     use_case().execute.return_value = ResponseFailure.build_from_resource_error(
         message=message,

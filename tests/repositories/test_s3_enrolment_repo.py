@@ -125,6 +125,41 @@ def test_get_enrolment_auth_by_id(json_loads):
     assert result == test_data.sample_enrolment_auth
 
 
+def test_enrolment_auth_exists_success():
+    repo = S3EnrolmentRepo()
+    stubber = Stubber(repo.s3)
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
+    stubber.add_response(
+        "get_object",
+        get_object_response(test_data.sample_enrolment_auth),
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id1}.json",
+        },
+    )
+    with stubber:
+        result = repo.enrolment_auth_exists(test_data.enrolment_id1)
+
+    assert result is True
+
+
+def test_enrolment_auth_exists_failure():
+    repo = S3EnrolmentRepo()
+    stubber = Stubber(repo.s3)
+    settings.ENROLMENT_AUTHORISATION_BUCKET = "some-bucket"
+    stubber.add_client_error(
+        "get_object",
+        {
+            "Bucket": "some-bucket",
+            "Key": f"enrolment_authorisations/{test_data.enrolment_id1}.json",
+        },
+    )
+    with stubber:
+        result = repo.enrolment_auth_exists(test_data.enrolment_id1)
+
+    assert result is False
+
+
 def test_update_enrolment_state():
     repo = S3EnrolmentRepo()
     stubber = Stubber(repo.s3)

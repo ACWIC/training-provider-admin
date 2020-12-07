@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.domain.entities.enrolment_request import State
 from app.repositories.s3_course_repo import S3CourseRepo
 from app.repositories.s3_enrolment_repo import S3EnrolmentRepo
-from app.requests.enrolment_requests import EnrolmentAuthRequest
+from app.requests.enrolment_requests import ProcessEnrolmentRequest
 from app.security import oauth2_scheme
 from app.use_cases import get_enrolments as ge
 from app.use_cases import process_enrolments as pe
@@ -45,7 +45,7 @@ def process_enrolment(
 ):
     """Change state of enrolment with the given new state value"""
 
-    request = EnrolmentAuthRequest(
+    request = ProcessEnrolmentRequest(
         enrolment_request_id=enrolment_request_id,
         new_state=new_state,
     )

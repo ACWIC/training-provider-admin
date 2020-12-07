@@ -5,7 +5,7 @@ from app.domain.entities.enrolment_request import (
     EnrolmentAuthFilters,
     State,
 )
-from app.requests.enrolment_requests import EnrolmentAuthRequest
+from app.requests.enrolment_requests import ProcessEnrolmentRequest
 
 
 class EnrolmentDataProvider:
@@ -93,10 +93,10 @@ class EnrolmentDataProvider:
             "enrolments": [self.sample_enrolment_auth1, self.sample_enrolment_auth2]
         }
 
-        self.process_enrolment_request = EnrolmentAuthRequest(
+        self.process_enrolment_request = ProcessEnrolmentRequest(
             enrolment_request_id=self.enrolment_id, new_state=State.ACCEPTED
         )
-        self.process_enrolment_failing_request = EnrolmentAuthRequest(
+        self.process_enrolment_failing_request = ProcessEnrolmentRequest(
             enrolment_request_id=self.enrolment_id, new_state=State.CANCELLED
         )
 
