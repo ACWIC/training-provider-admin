@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.repositories.s3_industry_standard_repo import S3IndustryStandardRepo
 from app.requests.industry_standard_request import IndustryStandardRequest
-from app.use_cases.delete_industry_standard import DeleteIndustryStandard
-from app.use_cases.get_industry_standards import GetIndustryStandards
-from app.use_cases.post_industry_standard import PostIndustryStandard
+from app.use_cases import delete_industry_standard as dis
+from app.use_cases import get_industry_standards as gis
+from app.use_cases import post_industry_standard as pis
 
 router = APIRouter()
 industry_standard_repo = S3IndustryStandardRepo()
@@ -13,22 +13,28 @@ industry_standard_repo = S3IndustryStandardRepo()
 @router.post("/industry_standards")
 def post_industry_standard(inputs: IndustryStandardRequest):
     """Create a new industry_standard in industry_standard repository"""
-    use_case = PostIndustryStandard(industry_standard_repo=industry_standard_repo)
+    use_case = pis.PostIndustryStandard(industry_standard_repo=industry_standard_repo)
     response = use_case.execute(inputs)
-    return response
+    if bool(response) is False:  # If request failed
+        raise HTTPException(status_code=response.type.value, detail=response.message)
+    return response.build()
 
 
 @router.delete("/industry_standards/{standard_id}")
 def delete_industry_standard(standard_id: str):
     """Delete an existing industry_standard in industry_standard respository"""
-    use_case = DeleteIndustryStandard(industry_standard_repo=industry_standard_repo)
+    use_case = dis.DeleteIndustryStandard(industry_standard_repo=industry_standard_repo)
     response = use_case.execute(standard_id)
-    return response
+    if bool(response) is False:  # If request failed
+        raise HTTPException(status_code=response.type.value, detail=response.message)
+    return response.build()
 
 
 @router.get("/industry_standards")
 def get_industry_standards():
     """Get industry_standards list in industry_standard respository"""
-    use_case = GetIndustryStandards(industry_standard_repo=industry_standard_repo)
+    use_case = gis.GetIndustryStandards(industry_standard_repo=industry_standard_repo)
     response = use_case.execute()
-    return response
+    if bool(response) is False:  # If request failed
+        raise HTTPException(status_code=response.type.value, detail=response.message)
+    return response.build()
