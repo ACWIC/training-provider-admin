@@ -46,5 +46,23 @@ class StandardsDataProvider:
         )
 
         self.industry_standard_list = {
-            "standards_list": [{"standard": self.industry_standard.dict()}]
+            "standards_list": [{"standard": self.industry_standard.json()}]
+        }
+
+        self.delete_standard_response = {
+            "ResponseMetadata": {
+                "RequestId": "164DD512D5F24240",
+                "HostId": "",
+                "HTTPStatusCode": 204,
+                "HTTPHeaders": {
+                    "accept-ranges": "bytes",
+                    "content-security-policy": "block-all-mixed-content",
+                    "server": "MinIO/RELEASE.2020-10-28T08-16-50Z",
+                    "vary": "Origin",
+                    "x-amz-request-id": "164DD512D5F24240",
+                    "x-xss-protection": "1; mode=block",
+                    "date": "Sat, 05 Dec 2020 13:28:38 GMT",
+                },
+                "RetryAttempts": 0,
+            }
         }

@@ -15,9 +15,9 @@ class GetIndustryStandards(BaseModel):
 
     def execute(self):
         try:
-            industry_standard = self.industry_standard_repo.get_standards()
+            response = self.industry_standard_repo.get_standards()
             message = "The industry_standard has been fetched."
         except Exception as e:
             return ResponseFailure.build_from_resource_error(message=e)
 
-        return ResponseSuccess(value=industry_standard, message=message)
+        return ResponseSuccess(value=response, message=message)
